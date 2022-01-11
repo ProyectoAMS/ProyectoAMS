@@ -1,0 +1,107 @@
+/*--Letra en general--*/
+*{
+	margin: 0;
+	padding: 0;
+	font-family: sans-serif;
+}
+/*--INICIO--*/
+.banner{
+	background-image: linear-gradient(#33FFB1, #1C7672);
+	
+}
+.header{
+	width: 80%;
+	margin: auto;
+	padding:35px 0;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+}
+.logo{
+	width: 120px;
+	cursor: pointer;
+}
+.nom-joc{
+    text-decoration: none;
+	color: #999999;
+	text-transform: uppercase;
+}
+.header ul li{
+	list-style: none;
+	display: inline-block;
+	margin: 0 20px;
+	position: relative;
+}
+.header ul li a{
+	text-decoration: none;
+	color: #fff;
+	text-transform: uppercase;
+}
+.header ul li::after{
+	content: '';
+	height: 3px;
+	width: 0;
+	background: #009688;
+	position: absolute;
+	left: 0;
+	bottom: 0;
+	transition: 0.5s;
+}
+.header ul li:hover::after{
+	width: 100%;
+}
+
+.img{
+	height: 200px;
+	width: auto;
+}
+.content{
+	text-align: justify;
+}
+.p1 , .p2 , .p3{
+	background-color: #1C7672;
+	border-radius: 10px;
+	margin: 15px;
+}
+
+
+
+.footer{
+	text-align: left;
+	color: #999999;
+}
+.icon{
+	text-align: right;
+	
+}
+button{
+	height: 50px;
+	width: 50px;
+	color: #33FFB1;
+	border-radius: 10%;
+	border: none;
+	cursor: pointer;
+}
+/*--VIDEO--*/
+.content2 iframe{
+	height: 500px;
+	width: auto;
+}
+.content2{
+	text-align: justify;
+}
+
+.l1::first-letter{
+	font-size:200%;
+  	float:left;
+  	color:#999999;
+}
+.l2::first-letter{
+	font-size:200%;
+  	float:left;
+  	color:#999999;
+}
+.vid{
+	height: 200px;
+	width: auto;
+}
