@@ -63,10 +63,8 @@
 	background-color: #1C7672;
 	border-radius: 10px;
 	margin: 15px;
+	display: flex;
 }
-
-
-
 .footer{
 	text-align: left;
 	color: #999999;
@@ -105,4 +103,24 @@ button{
 .vid{
 	height: 200px;
 	width: auto;
+}
+
+/*--AboutUs--*/
+.content img{
+	height: 250px;
+	width: auto;
+	padding: 30px;
+}
+.persona1, .persona2, .persona3, .persona4{
+	display: flex;
+	width: 50%;
+	height: 300px;
+	align-items: center;
+	background-color: cadetblue;
+	margin: 20px;
+	border-radius: 15px;
+	font-style: italic;
+}
+.contentAU{
+	align-items: center;
 }
