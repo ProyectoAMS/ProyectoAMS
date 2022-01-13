@@ -13,7 +13,7 @@
 .header{
 	width: 80%;
 	margin: auto;
-	padding:35px 0;
+	padding:5px 0;
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
@@ -113,14 +113,26 @@ button{
 }
 .persona1, .persona2, .persona3, .persona4{
 	display: flex;
-	width: 50%;
+	width: 75%;
 	height: 300px;
 	align-items: center;
 	background-color: cadetblue;
 	margin: 20px;
 	border-radius: 15px;
 	font-style: italic;
+	font-size: small;
 }
-.contentAU{
+
+
+.perfil{
+	margin-left: 25%;
+}
+/*--CONTACTO--*/
+form{
+	background-color: #999999;
+	width: 50%; 
+	margin-left: 25%;
 	align-items: center;
+	font-family : inherit;
+	font-size   : 100%;
 }
