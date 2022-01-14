@@ -1,0 +1,24 @@
+text = "12 34 567 8 910 11 1213 14"
+def formatText(text, lenLine = 20, split = "\n"):
+    l = text.split(" ")
+    lista_Frases = []
+    print(l)
+
+    for i in range(len(l)):
+        if not l[i] == l[-1]:
+            l[i] += " "
+    print(l)
+    contador = 0
+    for i in range(len(l)):
+        contador += len(l[i])
+        if contador <= lenLine or contador == lenLine + 1:
+            lista_Frases.append(l[i])
+        else:
+            lista_Frases.append(split + l[i])
+
+            contador = len(l[i])
+    print(lista_Frases)
+    for j in range(len(lista_Frases)):
+        print(lista_Frases[j], end= "")
+
+formatText(text)
