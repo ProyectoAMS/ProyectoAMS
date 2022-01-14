@@ -37,24 +37,30 @@ weigth_of_columns = (20,30,20,20)
 diccionari={
     4: {'idUser': 2, 'Username': 'Jordi', 'idAdventure':1, 
         'Name': 'Este muerto esta muy vivo',
+        'CharacterName':'Beowulf',
         'date': datetime.datetime(2021, 11, 28, 18, 17, 20),
         'idCharacter': 1, 
-        'CharacterName':'Beowulf'},
+        },
      
     5: {'idUser': 2, 'Username': 'Jordi','idAdventure': 1, 
-        'Name': 'Este muerto esta muy vivo', 
+        'Name': 'Este muerto esta muy vivo',
+        'CharacterName': 'Beowulf', 
         'date': datetime.datetime(2021, 11, 26,13, 28, 36), 
         'idCharacter': 1,
-        'CharacterName': 'Beowulf'}}
+        }}
 
 #---------------------------------------------------------------------------
 
 #getFormatedTable
 
 getTable = (
-    ('ID AVENTURA - NOMBRE', 'ID PASO - DESCRIPCION', 'ID RESPUESTA - DESCRIPCION', 'NUMERO VECES SELECCIONADA'), 
-    ('10 - Todos los héroes necesitan su princesa', '101 - Son las 6 \nde la mañana, personajes\n est├í profundamente\n dormido. Le suena la\n alarma!', '101 - Apaga la alarma\n porque quiere dormir,\n han sido d├¡as muy duros\n y personajes necesita\n un descanso.', 7), 
-    ('10 - Todos los héroes necesitan su princesa', '103 - Nuestro héroe\n personaje se viste\n rápidamente y va an\n direcci├│n al ciber, hay\n mucho jaleo en la calle,\n tambi├®n mucha policía.', '108 - Entra en el ciber\n a revisar si la princesa\n Wyoming sigue dentro.', 5)
+    ('ID AVENTURA - NOMBRE', 'ID PASO - DESCRIPCION', 'ID RESPUESTA - DESCRIPCION', 'NUMERO VECES SELECCIONADA'),
+     
+    ('10 - Todos los héroes ','necesitan su princesa', 
+    '101 - Son las 6 de la mañana, personajes  est├í profundamente dormido. Le suena la alarma!', 
+    '101 - Apaga la alarma porque quiere dormir, han sido días muy duros y personajes necesita un descanso.', 7), 
+
+    ('10 - Todos los héroes necesitan su princesa', '103 - Nuestro héroe personaje se viste rápidamente y van dirección al ciber, hay mucho jaleo en la calle, también mucha policía.', '108 - Entra en el ciber a revisar si la princesa Wyoming sigue dentro.', 5)
 )
 
 #////////////////////////////////////////////////////////////////////////////
@@ -115,7 +121,15 @@ def menu():
         print()
         
         opc = getOpt(textOpts,inputOptText,lista)
-        print(opc)
+        
+        if opc == 1:
+            print("Login")
+        elif opc == 2:
+            print("Create User")
+        elif opc == 3:
+            print("Show Adventures")
+        else:
+            quit()
         
 def getOpt(textOpts="",inputOptText="",rangeList=[],exceptions=[],**dictionary):
     valid = False
@@ -133,69 +147,72 @@ def getOpt(textOpts="",inputOptText="",rangeList=[],exceptions=[],**dictionary):
             print("Opció invàlida")
         else:
             valid = True
-            
-    if int(opcion) == 1:
-        
-        return "Login"
-    elif int(opcion) == 2:
-        return createUser()
-    elif int(opcion) == 3:
-        return "Show Adventures"
-    else:
-        quit()
+            return opcion
 
 """ def getTableFromDict(tuple_of_keys, diccionari, weigth_of_columns):
     
     weigth_of_columns = list(weigth_of_columns)
-    pos = 0
     
-    for i in diccionari.keys():
-        print(str(i).ljust(weigth_of_columns[0]), end="")
-        for k,l in diccionari[i].items(): 
-            print(str(l).ljust(weigth_of_columns[pos]), end="")
-            pos+=1
-
+    for i,j in diccionari.items():
+        pos = 0
+        print(str(i).ljust(weigth_of_columns[pos]), end="")
+        for k,l in j.items():
             
+            if pos == len(tuple_of_keys):
+                print("\n")
+                
+            if k in tuple_of_keys:
+                print(str(l).ljust(weigth_of_columns[pos]), end=" ")
+                pos+=1
+                
     return " "
-
-print(getTableFromDict(tuple_of_keys, diccionari, weigth_of_columns))
 """
 
-""" def getFormatedTable(queryTable, title="Most used answer"):
-    listQuery = list(queryTable)
+def formatText(text, lenLine = 21, split = "\n"):
+    l = text.split(" ")
+    lista_Frases = []
+    
+    for i in range(len(l)):
+        if not l[i] == l[-1]:
+            l[i] += " "
+    
+    contador = 0
+    for i in range(len(l)):
+        contador += len(l[i])
+        if contador <= lenLine or contador == lenLine + 1:
+            lista_Frases.append(l[i])
+        else:
+            lista_Frases.append(split + l[i])
+
+            contador = len(l[i])
+    
+    for j in range(len(lista_Frases)):
+        print(lista_Frases[j], end= " ")
+        
+    return " "
+
+def getFormatedTable(queryTable, title="Most used answer"):
+ 
     cont = 0
 
-    
-    for i in listQuery:
+    for i in queryTable:
+        length = 0
+        
         if cont == 0:
             print("="*60+title+"="*60+"\n")
             for j in i:
                 print(j, end=" "*14)
             print("\n\n"+"*"*136)
-        
-        elif cont == 1:
-            for j in i:
-                print(j, end = " ")
-                
-        elif cont == 2:
-            for j in i:
-                print(j)
-                
-        elif cont == 3:
-            for j in i:
-                print(j)  
-                
-        elif cont == 4:
-            for j in i:
-                print(j)
-        cont+=1
             
-        
+        for i in range(len(queryTable)):
+            for j in i:
+                print(formatText(str(j)))
+                
+                    
+                
+        cont+=1
         
     return " "
-
-print(getFormatedTable(getTable))
-"""
 
 def checkPassword(password):
     
@@ -278,7 +295,7 @@ def checkUser(user):
     pass
 """
 
-def createUser():
+""" def createUser():
     
     userOK = False
     passOK = False
@@ -299,5 +316,8 @@ def createUser():
         
     print()
     return input("Prém per continuar")
+"""
 
+def getTable(query):
+    pass
 #//////////////////////////////////////////////////////
