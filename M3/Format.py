@@ -119,7 +119,7 @@ opciones2={
 def getFormatedAnswers(idAnswer,text,lenLine,leftMargin):
     cont=1
     id=cont,")"
-    
+
     #print(len(idAnswer))
     while cont !=len(idAnswer)+1:
         formatText(idAnswer[cont][text], lenLine)
