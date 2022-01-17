@@ -31,21 +31,17 @@ exceptions = ["w","e",-1]
 
 import datetime
 
-tuple_of_keys = ('Username','Name','CharacterName','date')
-
-weigth_of_columns = (20,30,20,20)
-
 diccionari={
-    4: {'idUser': 2, 'Username': 'Jordi', 'idAdventure':1, 
-        'Name': 'Este muerto esta muy vivo',
-        'CharacterName':'Beowulf',
+    4: {'idUser': 2, 'username': 'Jordi', 'idAdventure':1, 
+        'adventure': 'Este muerto esta muy vivo',
+        'characterName':'Beowulf',
         'date': datetime.datetime(2021, 11, 28, 18, 17, 20),
         'idCharacter': 1, 
         },
      
-    5: {'idUser': 2, 'Username': 'Jordi','idAdventure': 1, 
-        'Name': 'Este muerto esta muy vivo',
-        'CharacterName': 'Beowulf', 
+    5: {'idUser': 2, 'username': 'Jordi','idAdventure': 1, 
+        'adventure': 'Este muerto esta muy vivo',
+        'characterName': 'Beowulf', 
         'date': datetime.datetime(2021, 11, 26,13, 28, 36), 
         'idCharacter': 1,
         }}
@@ -133,6 +129,7 @@ def menu():
         print()
         
         opcion = getOpt(textOpts,inputOptText,lista, exceptions)
+        print("\n")
         opc = int(opcion)
         
         if opc == 1:
@@ -157,37 +154,41 @@ def reports():
     inputOptText="\nEscull una opció: "
     lista = [1,2,3,4]
     
+    keys = ('idAventure','adventure', 'date')
+    columns = (20,20,20)
+    
     while True:
         titulo = """
-                                                                    ██████╗░███████╗██████╗░░█████╗░██████╗░████████╗░██████╗
-                                                                    ██╔══██╗██╔════╝██╔══██╗██╔══██╗██╔══██╗╚══██╔══╝██╔════╝
-                                                                    ██████╔╝█████╗░░██████╔╝██║░░██║██████╔╝░░░██║░░░╚█████╗░
-                                                                    ██╔══██╗██╔══╝░░██╔═══╝░██║░░██║██╔══██╗░░░██║░░░░╚═══██╗
-                                                                    ██║░░██║███████╗██║░░░░░╚█████╔╝██║░░██║░░░██║░░░██████╔╝
-                                                                    ╚═╝░░╚═╝╚══════╝╚═╝░░░░░░╚════╝░╚═╝░░╚═╝░░░╚═╝░░░╚═════╝░
+                                                                        ██████╗░███████╗██████╗░░█████╗░██████╗░████████╗░██████╗
+                                                                        ██╔══██╗██╔════╝██╔══██╗██╔══██╗██╔══██╗╚══██╔══╝██╔════╝
+                                                                        ██████╔╝█████╗░░██████╔╝██║░░██║██████╔╝░░░██║░░░╚█████╗░
+                                                                        ██╔══██╗██╔══╝░░██╔═══╝░██║░░██║██╔══██╗░░░██║░░░░╚═══██╗
+                                                                        ██║░░██║███████╗██║░░░░░╚█████╔╝██║░░██║░░░██║░░░██████╔╝
+                                                                        ╚═╝░░╚═╝╚══════╝╚═╝░░░░░░╚════╝░╚═╝░░╚═╝░░░╚═╝░░░╚═════╝░
 """
-        
-        
+                
         print("//"*104)
         print(titulo)
-        print()
-        
         print("//"*104)
         
         opcion = getOpt(textOpts,inputOptText,lista, exceptions)
-        
-        
+        print("\n")
         opc = int(opcion)
         
         if opc == 1:
             print("Resposta més utilitzada") 
             
         elif opc == 2:
-            print("Jugador amb més partides jugades") 
+            print(" "*40 + "Jugador amb més partides jugades")
+            getHeadeForTableFromTuples(("NOMBRE","USUARIO","PARTIDAS JUGADAS"),(10,20,30)) 
+            print("\n")
             
         elif opc == 3:
-            print("Jocs jugats per l'usuari")
-        
+            print(" "*40 + "Jocs jugats per l'usuari")
+            getHeadeForTableFromTuples(("ID AVENTURA","NOMBRE","FECHA"),(20,20,40)) 
+            getTableFromDict(keys, diccionari, columns)
+            print("\n")
+            
         else:
             break
     
@@ -206,14 +207,14 @@ def getOpt(textOpts="",inputOptText="",rangeList=[],exceptions=[],**dictionary):
         elif int(opcion) < rangeList[0] or int(opcion) > rangeList[-1]:  
             print("Opció invàlida")
         elif opcion in exceptions == False or opcion in rangeList == False:
-            print("Opció invàida")
+            print("Opció invàlida")
         else:
             break
         
     return opcion
 
 
-""" def getTableFromDict(tuple_of_keys, diccionari, weigth_of_columns):
+def getTableFromDict(tuple_of_keys, diccionari, weigth_of_columns):
     
     weigth_of_columns = list(weigth_of_columns)
     
@@ -222,7 +223,7 @@ def getOpt(textOpts="",inputOptText="",rangeList=[],exceptions=[],**dictionary):
         print(str(i).ljust(weigth_of_columns[pos]), end="")
         for k,l in j.items():
             
-            if pos == len(tuple_of_keys):
+            if pos == len(tuple_of_keys) - 1:
                 print("\n")
                 
             if k in tuple_of_keys:
@@ -230,7 +231,7 @@ def getOpt(textOpts="",inputOptText="",rangeList=[],exceptions=[],**dictionary):
                 pos+=1
                 
     return " "
-"""
+
 
 
 def formatText(text, lenLine = 25, split = "\n"):
@@ -279,7 +280,7 @@ def getFormatedTable(queryTable, title="Most used answer"):
         cont+=1
         
         
-print(getFormatedTable(getTable))
+#print(getFormatedTable(getTable))
 
 
 def checkPassword(password):
@@ -420,5 +421,39 @@ def insertUser(user, password):
 def getChoices():
     query = "SELECT * FROM "
     cursor.execute(query)
+
+
+def getHeadeForTableFromTuples(t_name_columns,t_size_columns,title=""):
+    cont1=0
+    cont2=0
+    dic1=[]
+    dic2=[]
+
+    print("="*100)
+    '''print("column1".ljust(10)+"column2".ljust(20)+"column3".ljust(30))
+    print(t_name_columns[0])
+    print(t_size_columns[0])'''
+
+    while cont1 != len(t_name_columns):
+        #print(t_name_columns[cont1])
+        dic1.append(t_name_columns[cont1])
+        cont1+=1
+    while cont2 != len(t_size_columns):
+        #print(t_size_columns[cont2])
+        dic2.append(t_size_columns[cont2])
+        cont2+=1
+
+    cont1 = 0
+    cont2 = 0
+    #print(dic1, dic2,"\n")
+
+    column=[]
+    while cont1 != len(dic1):
+        column.append(dic1[cont1].ljust(dic2[cont2]))
+        cont1 += 1
+        cont2 += 1
+    #print(column)
+    print("".join(column))
+    print("*"*100)
     
 #//////////////////////////////////////////////////////
