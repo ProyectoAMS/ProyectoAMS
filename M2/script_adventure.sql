@@ -1,0 +1,4 @@
+
+insert into AMS.ADVENTURE(ID_ADVENTURE,adventure_name,description) value(10,'El misteri de la casa encantada','La historia tracta d’un personatge que es fica en una casa abandonada, li han dit que aquesta casa esta encantada, veurem com es resol la aventura');
+insert into AMS.ADVENTURE(adventure_name,description) value('Un dia qualsevol','El personatge comença un nou dia de escola y tu escolliràs el seu camí al mateix, anirà o no anirà?');
+insert into AMS.ADVENTURE(adventure_name,description) value('Dia perillós ','Historia terrorífica que podrà passar el nostre personatge, un assassí escapat y uns pares desapareguts y tu amb el teu germà petit en mitat de no res. Que passarà?');
