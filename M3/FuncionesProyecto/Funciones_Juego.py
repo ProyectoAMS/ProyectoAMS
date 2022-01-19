@@ -1,7 +1,7 @@
 #//////////////// Imports ////////////////
 
 import datetime
-
+import time
 import pymysql
 
 #/////////////////////////////////////////
@@ -24,7 +24,7 @@ cursor = conn.cursor()
 
 
 
-#//////////////////////////// Variables globales ////////////////////////////
+#//////////////////////////////////////////////////////////////////////// Variables globales ////////////////////////////////////////////////////////////////////////
 
 diccionari={
     4: {'idUser': 2, 'username': 'Jordi', 'idAdventure':1, 
@@ -59,14 +59,13 @@ getTable = (
 
 query = "select username as NOMBRE, descripcion as DESCRIPCION from User"
 
-adventures={1:{"Adventure":"Este muerto esta myu vivo", "Description":"Beowlf, se embarca en la busqueda de la espada llamada la Ira de Los Cielos"},2:{"Adventure":"La Matanza de Texas", "Description":"Mario Vaquerizo, se enfrenta al horror"}}
 
-#////////////////////////////////////////////////////////////////////////////
-
+#////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
 
-#/////////////////// Menú ///////////////////
+
+#//////////////////////////////////////////////////////////////////////// Menú ////////////////////////////////////////////////////////////////////////
 
 def menu_before():
     
@@ -129,7 +128,14 @@ def menu_before():
         
         if opc == 1: # Iniciar sessió
             
-            jugar()
+            access = login()
+            
+            if access == 0:
+                menu_before()
+            elif access == -1:
+                menu_before
+            elif access == 1:
+                jugar()
             
         elif opc == 2: # Crear usuario
             
@@ -142,7 +148,7 @@ def menu_before():
             reports()
             
         else:
-            break
+            quit()
 
 
 def menu_after():
@@ -151,7 +157,6 @@ def menu_after():
     inputOptText="\n" + " "*60 + "Escull una opció: "
     
     lista = [1,2,3,4,5]
-    exceptions = ["w","e",-1,0]
     
     while True:
         titulo = """
@@ -200,7 +205,7 @@ def menu_after():
         print(titulo)
         print("\n")
         
-        opcion = getOpt(textOpts,inputOptText,lista, exceptions)
+        opcion = getOpt(textOpts,inputOptText,lista)
         print("\n")
         opc = int(opcion)
         
@@ -208,53 +213,64 @@ def menu_after():
 
             menu_before()
             
-        elif opc == 2: # Crear usuario
+        elif opc == 2: # Jugar
             
-            createUser()
+            jugar()
             
         elif opc == 3: # Rejugar aventura
-            pass
+            
+            query = " "
+            
+            choices = get_table(query)
+            
+            replay(choices)
             
         elif opc == 4:
+            
             reports()
             
         else:
-            break
+            quit()
 
 
 def jugar():
     
-    
     valid = False
-    lista = [0,1,2,3]
+    lista = [0]
     
-    #userInfo = getUser()
+    adventures = get_adventure_with_chars()
     
-    inputOptText= "Quina aventura vols jugar? (0 Go Back): "
+    for i in adventures.keys():
+        lista.append(i)
     
-    user = input("Usuari: ")
-    password = input("Contrasenya: ")
-    
-    """
-   chequeo = checkUserbdd(user, password)
-   
-    if chequeo == 0:
-       print("Usuari no existeix")
-    elif chequeo == -1:
-       print("Contrasenya incorrecta")
-    elif chequeo == 1:
-        print(f"Hola {user}, anem a jugar!!\nQuina aventura vols jugar?\n\n")
-   """
-   
-            
-    aventuras = str(getFormatedAdventures(adventures))
+    inputOptText= "Quina aventura vols jugar? (0 to Go Back): "
+                
+    aventuras = getFormatedAdventures(adventures)
     
     opc = getOpt(aventuras, inputOptText, lista)
     
-    query = f"INSERT INTO GAME (ID_GAME, current_date, FK_USER_ID_USER, FK_ADVENTURE_ID_ADVENTURE, FK_CHARACTER_ID_CHARACTER) values ()"
     
+    
+   
+    
+    #Opciones de las aventuras
     if int(opc) == 0:
         menu_after()
+        
+        
+    elif int(opc) == 10:
+     
+        menu_aventuras(10)
+        
+    elif int(opc) == 11:
+        
+        menu_aventuras(11)
+    
+    elif int(opc) == 12:
+        
+        menu_aventuras(12)
+
+
 
 def reports():
     
@@ -292,6 +308,19 @@ def reports():
             
         elif opc == 2:
             print(" "*40 + "Jugador amb més partides jugades")
+            
+            query = """
+            select count(G.FK_USER_ID_USER) into @partidas from GAME G;
+            
+            select U.user_name as NOMBRE USUARIO, @partidas as NÚMERO PARTIDAS JUGADAS from AMS.GAME G INNER JOIN AMS.USER U ON U.ID_USER = G.FK_USER_ID_USER;
+            """
+            
+            cursor.execute(query)
+            
+            res = cursor.fetchall()
+            
+            print(res)
+            
             getHeadeForTableFromTuples(("NOMBRE","USUARIO","PARTIDAS JUGADAS"),(10,20,30)) 
             print("\n")
             
@@ -304,14 +333,70 @@ def reports():
         else:
             break
     
-#////////////////////////////////////////////
+   
+def menu_aventuras(idAdventure):
+    
+    inputOptText = "Select your Character (0 to Go back): "
+    adventure = get_adventure_with_chars()
+    characters = get_characters()
+    
+    text = " "
+    
+    for i,j in adventure.items():
+        
+        for k,l in j.items():
+            if i == idAdventure:
+                if k == "Name":
+                    titulo = str(l)
+                    
+                if k == "Description":
+                    descripcion = str(l)
+            
+    getHeader(titulo)
+    print("Adventure:".ljust(20),titulo,"\n")
+    print("Description:".ljust(20),descripcion,"\n\n")
+
+    print("="*20+"Characters"+"="*20)
+    
+    
+    for j,k in characters.items():
+        
+        if idAdventure == 10:
+    
+            if j == 1:
+                print(f"{j}) {k}")
+            elif j == 2:
+                print(f"{j}) {k}")
+                
+        elif idAdventure == 11:
+            
+            if j == 3:
+                print(f"{j}) {k}")
+                
+        elif idAdventure == 12:
+            
+            if j == 4:
+                print(f"{j}) {k}")
+    
+    
+    opc = getOpt(text,inputOptText, rangeList=[0,1,2])
+    
+    if int(opc) == 0:
+        menu_after()
+        
+    elif int(opc) == 0:
+        
+        SetIdGame()
+
+
+#////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
 
 
 
 
-#////////////////////// Funciones de formato //////////////////////
+#/////////////////////////////////////////////////////////////// Funciones de formato ///////////////////////////////////////////////////////////////
 
 def getOpt(textOpts="",inputOptText="",rangeList=[],exceptions=[],**dictionary):
     
@@ -374,9 +459,7 @@ def formatText(text, lenLine = 25, split = "\n"):
     
     for j in range(len(lista_Frases)):
         print(lista_Frases[j], end= " ")
-    
-    print(lista_Frases)
-    
+        
     return " "
 
 
@@ -397,10 +480,9 @@ def getFormatedTable(queryTable, title="Most used answer"):
             for j in i:
                 print(formatText(str(j)))
         
-
         cont+=1
-   
-   
+
+    
 def getHeadeForTableFromTuples(t_name_columns,t_size_columns,title=""):
     cont1=0
     cont2=0
@@ -449,15 +531,28 @@ def getFormatedAdventures(adventures):
 
     for i in adventures:
 
-        print(str(i).ljust(12), adventures[i]["Adventure"].ljust(40), adventures[i]["Description"])
-        #formatText(adventures[i]["Description"])
+        print(str(i).ljust(12), adventures[i]["Name"].ljust(40), adventures[i]["Description"])
         
     return " "
+        
+        
+def getHeader(text):
+    l=50
+    r=50
+    medio=len(text)
+    num=medio/2
+    l=l-num
+    r=r-num
+
+    print("*" * 100)
+    print("="*int(l)+text+"="*int(r))
+    print("*" * 100)
+
 
 def replay(*choices):
     pass
 
-#//////////////////////////////////////////////////////////////////
+#////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
 
@@ -465,7 +560,68 @@ def replay(*choices):
 
 
 
-#//////////////////////// Funciones de usuario ////////////////////////
+#//////////////////////////////////////////////////////////// Funciones de usuario /////////////////////////////////////////////////////////////////
+
+
+def login():
+    
+    user = " "
+    password = " "
+
+    chequeo = checkUserbdd(user, password)
+    
+    userInfo = getUser()
+    
+
+    if int(chequeo) == 0:
+        print("Usuari no existeix")
+        return 0
+       
+    elif int(chequeo) == -1:
+        print("Contrasenya incorrecta")
+        return -1
+       
+    elif int(chequeo) == 1:
+        
+        for i in userInfo:
+            print(f"Hola {i}, anem a jugar!!\nQuina aventura vols jugar?\n\n")
+            return 1
+   
+
+def checkUserbdd (user,password):
+    
+    correct=False
+    mycursor=conn.cursor()
+    mycursor.execute('SELECT user_name FROM AMS.USER')
+    user= mycursor.fetchall()
+    lista1=[]
+    lista2=[]
+    
+    for i in user:
+        users=i[0]
+        lista1.append(users)
+    mycursor=conn.cursor()
+    mycursor.execute('SELECT password FROM AMS.USER')
+    contrasenya1= mycursor.fetchall()
+    for j in contrasenya1:
+        password=j[0]
+        lista2.append(password)
+        
+    while correct==False:
+        
+        usuari = input("Usuari a trobar: ")
+        contrasenya = input("Contrasenya: ")
+        
+        if usuari in lista1:
+            print('Usuari trobat')
+            if contrasenya in lista2:
+                correct=True
+                return 1
+            else:
+                return -1
+        else:
+            return 0
+
 
 def checkPassword(password):
     
@@ -571,6 +727,7 @@ def createUser():
             passOK = True
     
     insertUser(user, password)
+    
     print("Usuari creat satisfactoriament")
     print()
     return input("Prém per continuar")
@@ -578,9 +735,13 @@ def createUser():
 
 def insertUser(user, password):
     
-    query = f"INSERT INTO USER (user_name,password) values ({user},{password})"
+    query = f"INSERT INTO AMS.USER (user_name, password) values ('{user}','{password}')"
     
     cursor.execute(query)
+    
+    res = cursor.fetchall()
+    
+    print(res)
     
     conn.commit()
     
@@ -588,7 +749,7 @@ def insertUser(user, password):
 def getUser():
     
     diccionario={}
-    cursor.execute('SELECT * FROM user')
+    cursor.execute('SELECT * FROM USER')
     
     user= cursor.fetchall()
     for i in user:
@@ -600,12 +761,26 @@ def getUser():
         
     return diccionario
 
-#//////////////////////////////////////////////////////////////////////
+#//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
 
 
-#/////////////////// Funcions d'accés a BBDD ///////////////////
+#///////////////////////////////////////////////////////////////// Funcions d'accés a BBDD ////////////////////////////////////////////////////////////////
+
+def SetIdGame():
+    times=time.strftime('%Y-%m-%d %H:%M:%S')
+    idUser = " " #getUserId()
+    idAdventure = " "
+    idChar = " "
+    
+    sql=f"INSERT INTO AMS.GAME (current_data,FK_USER_ID_USER,FK_ADVENTURE_ID_ADVENTURE,FK_CHARACTER_ID_CHARACTER) VALUES('{times}','{idUser}','{idAdventure}','{idChar}')"
+    
+    mycursor=conn.cursor()
+    mycursor.execute(sql)
+    
+    conn.commit()
+
 
 def get_table(query):
     
@@ -618,18 +793,36 @@ def get_table(query):
     res.insert(0, fields_names)
     
     return tuple(res)
-
-
-def getChoices():
+ 
     
+def get_adventure_with_chars():
+    lista=[]
+    diccionario={}
     
+    mycursor=conn.cursor()
+    char = conn.cursor()
+    
+    sql='SELECT * FROM CHARACTER_HAS_ADVENTURE'
+    sql1='SELECT * FROM ADVENTURE'
+    mycursor.execute(sql)
 
-    cursor.execute(query)
-    
-    res = cursor.fetchall()
-    
-    return res
+    charac= mycursor.fetchall()
 
+    for j in charac:
+        id_char= j[0]
+        lista.append(id_char)
+
+    mycursor.execute(sql1)
+    adventures= mycursor.fetchall()
+
+    for i in adventures:
+        id_adventure=i[0]
+        name_adventure=i[1]
+        description_adventure=i[2]
+        diccionario1 = {id_adventure: {'Name': name_adventure, 'Description': description_adventure,'Characters':lista}}
+        diccionario.update(diccionario1)
+        
+    return diccionario
     
     
 def getReplayAdventures():
@@ -643,12 +836,24 @@ def getReplayAdventures():
     
     CHARACTER = "SELECT * FROM AMS.CHARACTER"
     
-    cursor.execute(ADVENTURE)
+    cursor.execute(CHARACTER)
     
     res = cursor.fetchall()
     
-    print(res)
+    return res
 
-print(getReplayAdventures())
 
-#///////////////////////////////////////////////////////////////
+def get_characters():
+    diccionario = {}
+    mycursor=conn.cursor()
+    mycursor.execute('SELECT * FROM AMS.CHARACTER')
+    user= mycursor.fetchall()
+    for i in user:
+        id=i[0]
+        name=i[1]
+        diccionario1 = {id: name}
+        diccionario.update(diccionario1)
+        
+    return diccionario
+
+#/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
