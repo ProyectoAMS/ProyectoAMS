@@ -7,7 +7,7 @@ mydb=mysql.connector.connect(
     database='ams'
 )
 
-# LAS VARIABLES SE IRAN RELLENANDO DURANTE EL JUEGO
+# LAS VARIABLES SE VAN RELLENANDO DURANTE EL JUEGO
 idGame=4
 idUser=6
 idAdventure=10
