@@ -1,3 +1,3 @@
 from FuncionesProyecto.Funciones_Juego import *
 
-menu()
+menu_before()
