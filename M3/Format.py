@@ -3,6 +3,12 @@
 '''--FUNCIONES--'''
 
 
+import pymysql
+#--ESTABLECER CONEXION--
+conn=pymysql.connect(host="localhost", user="root", password="Qwert12345", db="ams")
+import os
+
+
 text = "Nada es la primera novela de la escritora barcelonesa Carmen Laforet y una de las obras literarias más importantes de la España del siglo XX. Se trata de una obra existencialista1​ que representa el estancamiento y la pobreza que se vivieron en la posguerra española, durante los primeros años del franquismo. Dotada de un estilo literario que supuso una renovación en la prosa de la época, Nada refleja también la lenta desaparición de la pequeña burguesía tras la Guerra Civil."
 def formatText(text, lenLine = 50, split = "\n"):
     l = text.split(" ")
@@ -102,33 +108,15 @@ def getHeadeForTableFromTuples(t_name_columns,t_size_columns,title=""):
     print("*"*100)
 
 #getHeadeForTableFromTuples(("column1","column2","column3"),(10,20,30))
-opciones={
-    1:{"answer":"A aquesta funció li passem un id de resposta, el text de la resposta, "
-                "longitud de la línia i marge a la dreta, i ens retorna la resposta amb "
-                "els paràmetres passats. "},
-    2:{"answer":"Aquesta funció ens serà útil per a presentar les respostes possibles en "
-                "cadascun dels passos. "},
-    3:{"answer":"Observem que en formatar les línies, no tallem cap paraula per la meitat. "}
-}
-opciones2={
-    1:{"answer":"A aquesta funció li passem el diccionari adventures i retorna una "
-                "cadena que una vegada impresa ens mostra:"},
-    2:{"answer":"La capçalera de la selecció d'aventures i les aventures amb id, títol"
-                " i descripció de les aventures formatades en columnes."}
-}
-def getFormatedAnswers(idAnswer,text,lenLine,leftMargin):
-    cont=1
-    id=cont,")"
-
-    #print(len(idAnswer))
-    while cont !=len(idAnswer)+1:
-        formatText(idAnswer[cont][text], lenLine)
-        print()
-        cont+=1
 
 
 
-getFormatedAnswers(opciones2,"answer",80,"leftMargin")
+
+
+
+
+
+
 
 import datetime
 def getTableFromDict(tuple_of_keys, diccionari, weigth_of_columns):
@@ -148,18 +136,104 @@ def getTableFromDict(tuple_of_keys, diccionari, weigth_of_columns):
 
     return " "
 
-diccionari={
-    4: {'idUser': 2, 'Username': 'Jordi', 'idAdventure': 1, 'Name': 'Este muerto esta muy vivo',
-        'date': datetime.datetime(2021, 11, 28, 18, 17, 20), 'idCharacter': 1, 'CharacterName':
-'Beowulf'},
-    5: {'idUser': 2, 'Username': 'Jordi', 'idAdventure': 1, 'Name': "Este muerto esta muy vivo",
-        "date": datetime.datetime(2021, 11, 26, 13, 28, 36), 'idCharacter': 1,
-'CharacterName': 'Beowulf'}}
-tuple_of_keys = ("Username","Name","CharacterName","date")
-weigth_of_columns = (20, 30, 20, 20)
-
-#getTableFromDict(tuple_of_keys, diccionari,weigth_of_columns)
 
 
-def replay(choices):
+def getFormatedAnswers(idAnswer, text, lenLine, leftMargin):
+    cur = conn.cursor()
+
+    query = f'''select * from ams.option where FK_STEP_ID_STEP={idAnswer}'''
+    cur.execute(query)
+
+    answer = cur.fetchall()
+
+    for i in answer:
+        formatText(str(i[0])+") "+str(i[text]),lenLine)
+        print()
+
+"101<--poner el id de la pregunta"
+#getFormatedAnswers(101,1,100,50)
+
+
+
+def replay(choice):
+    # --CONSULTA--
+    cur = conn.cursor()
+    query1 = f"""select adventure_name, description, id_adventure from adventure 
+    where id_adventure=(select FK_ADVENTURE_ID_ADVENTURE from game where id_game={choice})"""
+    cur.execute(query1)
+    title = cur.fetchall()
+
     print()
+    getHeader(str(title[0][0]))
+    formatText(str(title[0][1]),100)
+    cur.close()
+    print()
+    input("\n\nEnter para Continuar")
+
+    #--CONSULTA--
+    cur = conn.cursor()
+    query2 = f"""select d.ID_DECEISION ,s.id_step, s.step_description, o.id_option, o.option_description, o.go_step, 
+    (select s.step_description from step s where o.go_step=s.ID_STEP)
+    from ams.option o inner join ams.step s on o.fk_step_id_step=s.id_step
+    inner join decision d on o.id_option=d.fk_option_id_option
+    where FK_GAME_ID_GAME={choice}"""
+    cur.execute(query2)
+    history = cur.fetchall()
+
+    #while history[] repetir hasta acabar el replay
+    for i in history:
+        formatText(str(i[2]), 100)
+        print("\n")
+    input("Enter to contiune\n")
+
+    for i in history:
+        print("opcion: ")
+        formatText(str(i[3]), 100)
+        print()
+        formatText(str(i[4]), 100)
+        print("\n")
+    input("Enter to continue")
+    for i in history:
+        formatText(str(i[6]), 100)
+        print("\n")
+    getHeader("FIN")
+    cur.close()
+    conn.close()
+
+#choice = int(input("elige id game: "))
+#replay(choice)
+
+
+
+
+def getChoices():
+    '''Una vegada hem triat l'aventura que volem reviure, get choices ens retorna una tupla
+    on els components són les tuples (idByStep_Adventure, idAnswers_ByStep_Adventure),
+    que ens permetran reviure una aventura donada'''
+
+    cur = conn.cursor()
+    query3 = '''select FK_GAME_ID_GAME, d.fk_option_id_option, o.answer from ams.decision d 
+    inner join ams.option o on d.fk_option_id_option = o.id_option'''
+    cur.execute(query3)
+    choices = cur.fetchall()
+    print(choices)
+    input("\npulsar")
+
+#getChoices()
+
+def insertCurrentChoice(idGame,actual_id_step,id_answer):
+    '''Aquesta funció actualitza la taula choices.'''
+
+    cur = conn.cursor()
+    query4 = f'''inser into decision (FK_GAME_ID_GAME, id_step) value ({idGame}, )'''
+    cur.execute(query4)
+    choices = cur.fetchall()
+    getChoices()
+    input("\npulsar")
+
+
+idGame = int(input("Introduce el id del juego: "))
+actual_id_step = int(input("introduce el id_step actual: "))
+id_answer = int(input("Introduce el id_answer (answer) en la db: "))
+#insertCurrentChoice(idGame, actual_id_step, id_answer)
+os.system("tree")

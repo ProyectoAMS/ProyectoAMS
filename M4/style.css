@@ -80,49 +80,56 @@
 	border: 1px solid;
 
 }
+.icon{
+	text-align: right;	
+}
+
 /*--INICIO--*/
 .banner{
 	background-image: linear-gradient(#33FFB1, #1C7672);
 }
-.titulo_sub h1 h3{
-
- 	color: #999999;
+.titulo_sub{
+	color:#999999;
 	font-family: 'Franklin Gothic Medium';
-	align-content: center;
-	padding: 5px;
-
+	margin-left: 25%;
 }
 .content{
 	text-align: justify;
 }
 .p1 , .p2 , .p3{
 	background-color: #1C7672;
+	display: flex;
 	border-radius: 10px;
 	margin: 5%;
-	height: auto;
+	height: 300px;
 	width: 50%;
 	margin-left: 25%;
 	
 }
-.p1 h3, .p1 p, .p2 h3, .p2 p, .p3 h3, .p3 p{
+.content .p1 .text,.content .p2 .text,.content .p3 .text{
+	
+	height: 200px;
+	width: 70%;
 	display: flex;
 	flex-direction: column;
-
+	padding-top: 10%;
 }
-.p1 .img,.p2 .img,.p3 .img{
-	height: 200px;
+.content .p1 .img,.content .p2 .img,.content .p3 .img{
 	width: auto;
+	height: 200px;
+	padding: 30px;
+	border-radius: 10px;
 }
 
-.icon{
-	text-align: right;
-	
-}
+
 
 /*--VIDEO--*/
-
 .content2{
 	text-align: justify;
+}
+.content2 h2{
+	margin-left: 25%;
+	color: #999999;
 }
 #video1, #video2{
 	background-color: #1C7672;
@@ -165,19 +172,22 @@
 	border: none;
 	cursor: pointer;
 }
-/*#contact_form{
-	margin-left: 100%;
-}*/
+
 
 /*--AboutUs--*/
-.content img{
-	height: 250px;
-	width: auto;
+.content h1{
+	margin-left: 25%;
+	color: #999999;
+}
+.content .perfil img{
+	height: 150px;
+	width: 150px;
 	padding: 30px;
+	border-radius: 50%;
 }
 .persona1, .persona2, .persona3, .persona4{
 	display: flex;
-	width: 75%;
+	width: 60%;
 	height: 300px;
 	align-items: center;
 	background-color: cadetblue;
@@ -186,10 +196,15 @@
 	font-style: italic;
 	font-size: small;
 }
-
-
 .perfil{
 	margin-left: 25%;
+}
+.persona1 .texto, .persona2 .texto, .persona3 .texto, .persona4 .texto{
+	height: 200px;
+	width: 70%;
+	display: flex;
+	flex-direction: column;
+	padding-top: 10%;
 }
 /*--CONTACTO--*/
 #contact_form{
