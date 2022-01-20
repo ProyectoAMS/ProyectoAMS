@@ -17,7 +17,7 @@ idstep=101
 idadventure=10
 
 def insertCurrentChoise(idGame,idstep,idoption):
-    sql=f"INSERT INTO ams.decision(FK_GAME_ID_GAME,FK_GAME_USER_ID_USER,FK_GAME_ADVENTURE_ID_ADVENTURE,FK_GAME_CHARACTER_ID_CHARACTER,FK_OPTION_ID_OPTION,FK_STEP_ID_STEP,FK_STEP_ADVENTURE_ID_ADVENTURE) VALUES('{idGame}','{idUser}','{idAdventure}','{idChar}','{idoption}','{idstep}','{idadventure}')"
+    sql=f"INSERT INTO AMS.CHOICE(FK_GAME_ID_GAME,FK_GAME_USER_ID_USER,FK_GAME_ADVENTURE_ID_ADVENTURE,FK_GAME_CHARACTER_ID_CHARACTER,FK_OPTION_ID_OPTION,FK_STEP_ID_STEP,FK_STEP_ADVENTURE_ID_ADVENTURE) VALUES('{idGame}','{idUser}','{idAdventure}','{idChar}','{idoption}','{idstep}','{idadventure}')"
     mycursor=mydb.cursor()
     mycursor.execute(sql)
     mydb.commit()
