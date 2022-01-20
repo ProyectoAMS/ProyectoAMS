@@ -339,16 +339,26 @@ def reports():
         print("\n")
         
         if opc == 1:
-            print("Resposta més utilitzada") 
+            
+            query = """SELECT CONCAT(A.ID_ADVENTURE," - ",A.adventure_name) as "ID AVENTURA - NOMBRE", 
+            concat(S.ID_STEP, S.step_description) as "ID PASO - DESCRIPCION", 
+            concat(O.answer," - ",O.option_description) as "ID RESPUESTA - DESCRIPCION", 
+            concat("ALGO") as "NÚMERO VECES SELECCIONADA" 
+            from AMS.ADVENTURE A INNER JOIN AMS.STEP S ON S.FK_ADVENTURE_ID_ADVENTURE = A.ID_ADVENTURE INNER JOIN AMS.OPTION O ON O.FK_STEP_ID_STEP = S.ID_STEP;
+            """
+            print()
+            print(getFormatedTable(get_table(query)))
+            print()
             
         elif opc == 2:
-            print(" "*40 + "Jugador amb més partides jugades")
             
-            query = """
-            select count(G.FK_USER_ID_USER) into @partidas from GAME G;
+            print("\n"+" "*40 + "Jugador amb més partides jugades")
             
-            select U.user_name as NOMBRE USUARIO, @partidas as NÚMERO PARTIDAS JUGADAS from AMS.GAME G INNER JOIN AMS.USER U ON U.ID_USER = G.FK_USER_ID_USER;
-            """
+            partidas = "select count(G.FK_USER_ID_USER) into @partidas from GAME G;"
+        
+            cursor.execute(partidas)
+            
+            query = f"select U.user_name as 'NOMBRE USUARIO', @{partidas} as 'NÚMERO PARTIDAS JUGADAS' from AMS.GAME G INNER JOIN AMS.USER U ON U.ID_USER = G.FK_USER_ID_USER;"
             
             cursor.execute(query)
             
@@ -1038,8 +1048,8 @@ def getChoices():
     que ens permetran reviure una aventura donada'''
 
     cur = conn.cursor()
-    query3 = '''select FK_GAME_ID_GAME, d.fk_option_id_option, o.answer from ams.decision d 
-    inner join ams.option o on d.fk_option_id_option = o.id_option'''
+    query3 = '''select D.FK_GAME_ID_GAME, D.FK_OPTION_ID_OPTION, O.answer from AMS.DECISION D 
+    inner join AMS.OPTION O on D.FK_OPTION_ID_OPTION = O.ID_OPTION'''
     cur.execute(query3)
     choices = cur.fetchall()
     print(choices)
