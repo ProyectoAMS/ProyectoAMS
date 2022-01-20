@@ -12,9 +12,9 @@ import pymysql
 
 #Establecer la conexión
 conn = pymysql.connect(
-    host="40.68.208.129",
-    user="azure-admin",
-    password = "mypass123",
+    host="localhost",
+    user="jismael",
+    password = "Admin123-",
     db = "AMS"
 )
 
@@ -142,7 +142,8 @@ def menu_before():
             createUser()
             
         elif opc == 3: # Rejugar aventura
-            pass
+            
+            replayAdventureMenu()
             
         elif opc == 4:
             reports()
@@ -219,11 +220,7 @@ def menu_after():
             
         elif opc == 3: # Rejugar aventura
             
-            query = " "
-            
-            choices = get_table(query)
-            
-            replay(choices)
+            replayAdventureMenu()
             
         elif opc == 4:
             
@@ -271,6 +268,44 @@ def jugar():
         menu_aventuras(12)
 
 
+def replayAdventureMenu():
+    
+    keys = ("idUser","username","adventure","characterName","date")
+    
+    columns = (10,20,30,20,20)
+    
+    titulo = """
+                                             ██████╗░███████╗██╗░░░██╗██╗██╗░░░██╗  ██╗░░░░░░█████╗░  ████████╗███████╗██╗░░░██╗░█████╗░
+                                             ██╔══██╗██╔════╝██║░░░██║██║██║░░░██║  ██║░░░░░██╔══██╗  ╚══██╔══╝██╔════╝██║░░░██║██╔══██╗
+                                             ██████╔╝█████╗░░╚██╗░██╔╝██║██║░░░██║  ██║░░░░░███████║  ░░░██║░░░█████╗░░╚██╗░██╔╝███████║
+                                             ██╔══██╗██╔══╝░░░╚████╔╝░██║██║░░░██║  ██║░░░░░██╔══██║  ░░░██║░░░██╔══╝░░░╚████╔╝░██╔══██║
+                                             ██║░░██║███████╗░░╚██╔╝░░██║╚██████╔╝  ███████╗██║░░██║  ░░░██║░░░███████╗░░╚██╔╝░░██║░░██║
+                                             ╚═╝░░╚═╝╚══════╝░░░╚═╝░░░╚═╝░╚═════╝░  ╚══════╝╚═╝░░╚═╝  ░░░╚═╝░░░╚══════╝░░░╚═╝░░░╚═╝░░╚═╝
+                                             
+                                             ░█████╗░██╗░░░██╗███████╗███╗░░██╗████████╗██╗░░░██╗██████╗░░█████╗░
+                                             ██╔══██╗██║░░░██║██╔════╝████╗░██║╚══██╔══╝██║░░░██║██╔══██╗██╔══██╗
+                                             ███████║╚██╗░██╔╝█████╗░░██╔██╗██║░░░██║░░░██║░░░██║██████╔╝███████║
+                                             ██╔══██║░╚████╔╝░██╔══╝░░██║╚████║░░░██║░░░██║░░░██║██╔══██╗██╔══██║
+                                             ██║░░██║░░╚██╔╝░░███████╗██║░╚███║░░░██║░░░╚██████╔╝██║░░██║██║░░██║
+                                             ╚═╝░░╚═╝░░░╚═╝░░░╚══════╝╚═╝░░╚══╝░░░╚═╝░░░░╚═════╝░╚═╝░░╚═╝╚═╝░░╚═╝
+"""
+    
+    print(" "*7+"//"*90)
+    print("\n"*3)
+    print(titulo)
+    print("\n"*3)
+    print(" "*7+"//"*90)
+    
+    input("Prém ENTER per continuar")
+    print()
+    
+    
+    diccionari = getReplayAdventures()
+    
+    print(getHeadeForTableFromTuples(("Id","Username","Name","CharacterName","date"),(10,20,30,20,20)))
+    
+    getTableFromDict(keys, diccionari, columns)
+    
 
 def reports():
     
@@ -425,10 +460,9 @@ def getTableFromDict(tuple_of_keys, diccionari, weigth_of_columns):
     
     for i,j in diccionari.items():
         pos = 0
-        print(str(i).ljust(weigth_of_columns[pos]), end="")
         for k,l in j.items():
             
-            if pos == len(tuple_of_keys) - 1:
+            if pos == 5:
                 print("\n")
                 
             if k in tuple_of_keys:
@@ -515,6 +549,8 @@ def getHeadeForTableFromTuples(t_name_columns,t_size_columns,title=""):
     #print(column)
     print("".join(column))
     print("*"*100)
+    
+    return " "
 
 
 def getFormatedAdventures(adventures):
@@ -549,8 +585,51 @@ def getHeader(text):
     print("*" * 100)
 
 
-def replay(*choices):
-    pass
+def replay(choice):
+    # --CONSULTA--
+    cur = conn.cursor()
+    query1 = f"""select adventure_name, description, id_adventure from adventure 
+    where id_adventure=(select FK_ADVENTURE_ID_ADVENTURE from game where id_game={choice})"""
+    cur.execute(query1)
+    title = cur.fetchall()
+
+    print()
+    getHeader(str(title[0][0]))
+    formatText(str(title[0][1]),100)
+    cur.close()
+    print()
+    input("\n\nEnter para Continuar")
+
+    #--CONSULTA--
+    cur = conn.cursor()
+    query2 = f"""select d.ID_DECEISION ,s.id_step, s.step_description, o.id_option, o.option_description, o.go_step, 
+    (select s.step_description from step s where o.go_step=s.ID_STEP)
+    from ams.option o inner join ams.step s on o.fk_step_id_step=s.id_step
+    inner join decision d on o.id_option=d.fk_option_id_option
+    where FK_GAME_ID_GAME={choice}"""
+    cur.execute(query2)
+    history = cur.fetchall()
+
+    #while history[] repetir hasta acabar el replay
+    for i in history:
+        formatText(str(i[2]), 100)
+        print("\n")
+    input("Enter to contiune\n")
+
+    for i in history:
+        print("opcion: ")
+        formatText(str(i[3]), 100)
+        print()
+        formatText(str(i[4]), 100)
+        print("\n")
+    input("Enter to continue")
+    for i in history:
+        formatText(str(i[6]), 100)
+        print("\n")
+    getHeader("FIN")
+    cur.close()
+    conn.close()
+
 
 #////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -761,12 +840,79 @@ def getUser():
         
     return diccionario
 
+
+def getUserIds():
+    mycursor=conn.cursor()
+    mycursor.execute('SELECT user_name FROM USER')
+    user= mycursor.fetchall()
+    lista1=[]
+    lista2=[]
+    listafinal=[]
+    for i in user:
+        users=i[0]
+        lista1.append(users)
+    mycursor=conn.cursor()
+    mycursor.execute('SELECT ID_USER FROM USER')
+    id= mycursor.fetchall()
+    for j in id:
+        ids=j[0]
+        lista2.append(ids)
+    listafinal.append(lista1)
+    listafinal.append(lista2)
+    print(listafinal)
+
 #//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
 
 
 #///////////////////////////////////////////////////////////////// Funcions d'accés a BBDD ////////////////////////////////////////////////////////////////
+
+def insertCurrentGame(idGame,idUser,idChar,idAdventure):
+    tiempo=time.strftime('%Y-%m-%d %H:%M:%S')
+    sql=f"INSERT INTO ams.game(current_data,FK_USER_ID_USER,FK_ADVENTURE_ID_ADVENTURE,FK_CHARACTER_ID_CHARACTER) VALUES('{tiempo}','{idUser}','{idAdventure}','{idChar}')"
+    mycursor=conn.cursor()
+    mycursor.execute(sql)
+    conn.commit()
+
+
+# LAS VARIABLES SE VAN RELLENANDO DURANTE EL JUEGO
+idGame=4
+idUser=6
+idAdventure=10
+idChar=7
+idoption=101
+idstep=101
+idadventure=10
+
+def insertCurrentChoise(idGame,idstep,idoption):
+    sql=f"INSERT INTO ams.decision(FK_GAME_ID_GAME,FK_GAME_USER_ID_USER,FK_GAME_ADVENTURE_ID_ADVENTURE,FK_GAME_CHARACTER_ID_CHARACTER,FK_OPTION_ID_OPTION,FK_STEP_ID_STEP,FK_STEP_ADVENTURE_ID_ADVENTURE) VALUES('{idGame}','{idUser}','{idAdventure}','{idChar}','{idoption}','{idstep}','{idadventure}')"
+    mycursor=conn.cursor()
+    mycursor.execute(sql)
+    conn.commit()
+
+
+def get_first_step_adventure():
+    while True:
+        aventura = input('Aventura')
+        if aventura=='10' or aventura=='11' or aventura=='12':
+            mycursor=conn.cursor()
+            sql1=f"SELECT * FROM STEP WHERE FK_ADVENTURE_ID_ADVENTURE= {aventura} "
+            mycursor.execute(sql1)
+            user= mycursor.fetchall()
+            lista=[]
+            for i in user[0]:
+                lista.append(i)
+            id=lista[0]
+            description=lista[1]
+            lista2=[]
+            lista2.append(id)
+            lista2.append(description)
+            print(lista2)
+            break
+        else:
+            print('No es possible aquesta opció')
+
 
 def get_adventure_with_chars():
     lista=[]
@@ -798,7 +944,6 @@ def get_adventure_with_chars():
     return diccionario
     
 
-
 def SetIdGame():
     times=time.strftime('%Y-%m-%d %H:%M:%S')
     idUser = " " #getUserId()
@@ -828,20 +973,40 @@ def get_table(query):
     
 def getReplayAdventures():
     
-    diccionario = {}
+    dictGame = {}
+    dictUser = {}
     
-    USER = " SELECT * FROM AMS.USER;"
+    query1 = """SELECT G.ID_GAME, U.ID_USER, U.user_name, A.ID_ADVENTURE, A.adventure_name, G.current_date, C.ID_CHARACTER, C.character_name FROM AMS.USER U
+        INNER JOIN AMS.GAME G ON U.ID_USER = G.FK_USER_ID_USER
+        INNER JOIN ADVENTURE A ON A.ID_ADVENTURE = G.FK_ADVENTURE_ID_ADVENTURE
+        INNER JOIN AMS.CHARACTER C ON C.ID_CHARACTER = G.FK_CHARACTER_ID_CHARACTER;"""
     
-    ADVENTURE = "SELECT * FROM AMS.ADVENTURE"
-
     
-    CHARACTER = "SELECT * FROM AMS.CHARACTER"
+    cursor.execute(query1)
     
-    cursor.execute(CHARACTER)
+    game = cursor.fetchall()
+     
+    for i in game:
+        idGame = i[0]
+        idUser = i[1]
+        user_name = i[2]
+        idAdventure = i[3]
+        adventure_name = i[4]
+        date = i[5]
+        idCharacter = i[6]
+        characterName = i[7]
+        
+        dictUser["idUser"] = idUser
+        dictUser["username"] = user_name
+        dictUser["idAdventure"] = idAdventure
+        dictUser["adventure"] = adventure_name
+        dictUser["characterName"] = characterName
+        dictUser["date"] = date
+        dictUser["idCharacter"] = idCharacter
+        
+        dictGame[idGame] = dictUser
     
-    res = cursor.fetchall()
-    
-    return res
+    return dictGame
 
 
 def get_characters():
@@ -857,4 +1022,26 @@ def get_characters():
         
     return diccionario
 
+
+def get_id_game():
+    mycursor = conn.cursor()
+    mycursor.execute('SELECT * FROM GAME')
+    game = mycursor.fetchall()
+    for i in game:
+        id = i[0]
+        return id
+
+
+def getChoices():
+    '''Una vegada hem triat l'aventura que volem reviure, get choices ens retorna una tupla
+    on els components són les tuples (idByStep_Adventure, idAnswers_ByStep_Adventure),
+    que ens permetran reviure una aventura donada'''
+
+    cur = conn.cursor()
+    query3 = '''select FK_GAME_ID_GAME, d.fk_option_id_option, o.answer from ams.decision d 
+    inner join ams.option o on d.fk_option_id_option = o.id_option'''
+    cur.execute(query3)
+    choices = cur.fetchall()
+    print(choices)
+    input("\npulsar")
 #/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
