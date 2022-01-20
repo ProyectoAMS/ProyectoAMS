@@ -12,7 +12,7 @@ _La mecánica de Choose your Story consiste en un juego de eleccion lineal, dond
 
 * [Microsoft Azure](https://azure.microsoft.com/es-es/free/search/) - El ambiente de la maquina
 * [MySql](https://www.mysql.com) - Manejador de la Base de Datos
-* [PyCharm](https://www.jetbrains.com/es-es/pycharm/) - Usado Usado para el desarollo
+* [PyCharm](https://www.jetbrains.com/es-es/pycharm/) - Usado para el desarrollo
 
 
 ## Autores ✒️
