@@ -768,33 +768,6 @@ def getUser():
 
 #///////////////////////////////////////////////////////////////// Funcions d'accés a BBDD ////////////////////////////////////////////////////////////////
 
-def SetIdGame():
-    times=time.strftime('%Y-%m-%d %H:%M:%S')
-    idUser = " " #getUserId()
-    idAdventure = " "
-    idChar = " "
-    
-    sql=f"INSERT INTO AMS.GAME (current_data,FK_USER_ID_USER,FK_ADVENTURE_ID_ADVENTURE,FK_CHARACTER_ID_CHARACTER) VALUES('{times}','{idUser}','{idAdventure}','{idChar}')"
-    
-    mycursor=conn.cursor()
-    mycursor.execute(sql)
-    
-    conn.commit()
-
-
-def get_table(query):
-    
-    cursor.execute(query)
-    res = list(cursor.fetchall())
-    
-    nums_fields = len(cursor.description)
-    
-    fields_names = tuple([i[0] for i in cursor.description])
-    res.insert(0, fields_names)
-    
-    return tuple(res)
- 
-    
 def get_adventure_with_chars():
     lista=[]
     diccionario={}
@@ -824,6 +797,34 @@ def get_adventure_with_chars():
         
     return diccionario
     
+
+
+def SetIdGame():
+    times=time.strftime('%Y-%m-%d %H:%M:%S')
+    idUser = " " #getUserId()
+    idAdventure = " "
+    idChar = " "
+    
+    sql=f"INSERT INTO AMS.GAME (current_data,FK_USER_ID_USER,FK_ADVENTURE_ID_ADVENTURE,FK_CHARACTER_ID_CHARACTER) VALUES('{times}','{idUser}','{idAdventure}','{idChar}')"
+    
+    mycursor=conn.cursor()
+    mycursor.execute(sql)
+    
+    conn.commit()
+
+
+def get_table(query):
+    
+    cursor.execute(query)
+    res = list(cursor.fetchall())
+    
+    nums_fields = len(cursor.description)
+    
+    fields_names = tuple([i[0] for i in cursor.description])
+    res.insert(0, fields_names)
+    
+    return tuple(res)
+ 
     
 def getReplayAdventures():
     
