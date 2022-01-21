@@ -10,6 +10,19 @@ import pymysql
 
 #///////////// Conexión a la BBDD //////////////
 
+
+"""
+#Establecer la conexión
+conn = pymysql.connect(
+    host="40.68.208.129",
+    user="azure-admin",
+    password = "mypass123",
+    db = "AMS"
+)
+
+cursor = conn.cursor()
+"""
+
 #Establecer la conexión
 conn = pymysql.connect(
     host="localhost",
@@ -21,48 +34,6 @@ conn = pymysql.connect(
 cursor = conn.cursor()
 
 #///////////////////////////////////////////////
-
-
-
-#//////////////////////////////////////////////////////////////////////// Variables globales ////////////////////////////////////////////////////////////////////////
-
-diccionari={
-    4: {'idUser': 2, 'username': 'Jordi', 'idAdventure':1, 
-        'adventure': 'Este muerto esta muy vivo',
-        'characterName':'Beowulf',
-        'date': datetime.datetime(2021, 11, 28, 18, 17, 20),
-        'idCharacter': 1, 
-        },
-     
-    5: {'idUser': 2, 'username': 'Jordi','idAdventure': 1, 
-        'adventure': 'Este muerto esta muy vivo',
-        'characterName': 'Beowulf', 
-        'date': datetime.datetime(2021, 11, 26,13, 28, 36), 
-        'idCharacter': 1,
-        }}
-
-#---------------------------------------------------------------------------
-
-getTable = (
-    ('ID AVENTURA - NOMBRE', 'ID PASO - DESCRIPCION', 'ID RESPUESTA - DESCRIPCION', 'NUMERO VECES SELECCIONADA'),
-     
-    ('10 - Todos los héroes ','necesitan su princesa', 
-    '101 - Son las 6 de la mañana, personajes  est├í profundamente dormido. Le suena la alarma!', 
-    '101 - Apaga la alarma porque quiere dormir, han sido días muy duros y personajes necesita un descanso.', 7), 
-
-    ('10 - Todos los héroes necesitan su princesa', '103 - Nuestro héroe personaje se viste rápidamente y van dirección al ciber, hay mucho jaleo en la calle, también mucha policía.', '108 - Entra en el ciber a revisar si la princesa Wyoming sigue dentro.', 5)
-)
-
-#---------------------------------------------------------------------------
-
-#get_table()
-
-query = "select username as NOMBRE, descripcion as DESCRIPCION from User"
-
-
-#////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-
 
 
 #//////////////////////////////////////////////////////////////////////// Menú ////////////////////////////////////////////////////////////////////////
@@ -296,7 +267,7 @@ def replayAdventureMenu():
     print("\n"*3)
     print(" "*7+"//"*90)
     
-    input("Prém ENTER per continuar")
+    input("\nPrém ENTER per continuar")
     print()
     
     
@@ -306,6 +277,7 @@ def replayAdventureMenu():
     
     getTableFromDict(keys, diccionari, columns)
     
+    
 
 def reports():
     
@@ -314,8 +286,7 @@ def reports():
     lista = [1,2,3,4]
     exceptions = ["w","e",-1,0]
     
-    keys = ('idAventure','adventure', 'date')
-    columns = (20,20,20)
+    
     
     while True:
         titulo = """
@@ -338,7 +309,11 @@ def reports():
         opc = int(opcion)
         print("\n")
         
+        
+        #Menú Respostes més jugades
         if opc == 1:
+            tupla = (10,20,20)
+            tupla_texts = []
             
             query = """SELECT CONCAT(A.ID_ADVENTURE," - ",A.adventure_name) as "ID AVENTURA - NOMBRE", 
             concat(S.ID_STEP, S.step_description) as "ID PASO - DESCRIPCION", 
@@ -346,38 +321,88 @@ def reports():
             concat("ALGO") as "NÚMERO VECES SELECCIONADA" 
             from AMS.ADVENTURE A INNER JOIN AMS.STEP S ON S.FK_ADVENTURE_ID_ADVENTURE = A.ID_ADVENTURE INNER JOIN AMS.OPTION O ON O.FK_STEP_ID_STEP = S.ID_STEP;
             """
-            print()
-            print(getFormatedTable(get_table(query)))
-            print()
             
+            res = list(get_table(query))
+            
+            for i in res:
+                tupla_texts.append(list(i))
+                
+            print(tupla_texts)
+            print()
+            print(getFormatedBodyColumns(tupla_texts, tupla))
+            print()
+        
+        # Menú Más partidas jugadas
         elif opc == 2:
             
-            print("\n"+" "*40 + "Jugador amb més partides jugades")
+            query = """ SELECT U.user_name, count(G.FK_USER_ID_USER) from AMS.GAME G 
+            INNER JOIN AMS.USER U ON U.ID_USER = G.FK_USER_ID_USER
+            group by U.user_name
+            order by count(G.FK_USER_ID_USER)
+            desc limit 1; """
+                        
+            #print(getFormatedTable(get_table(query)), title="Player with more games played")
             
-            partidas = "select count(G.FK_USER_ID_USER) into @partidas from GAME G;"
-        
-            cursor.execute(partidas)
+            print(" "*33 + "Player with most games played")
             
-            query = f"select U.user_name as 'NOMBRE USUARIO', @{partidas} as 'NÚMERO PARTIDAS JUGADAS' from AMS.GAME G INNER JOIN AMS.USER U ON U.ID_USER = G.FK_USER_ID_USER;"
+            print(getHeadeForTableFromTuples(("USUARIO","PARTIDAS JUGADAS"),(40,20)))
             
             cursor.execute(query)
             
             res = cursor.fetchall()
             
-            print(res)
+            for i in res:
+                j = list(i)
+                cont = 0
+                for k in j:
+                    
+                    cont+=1
+                    
+                    print(str(k).ljust(40), end=" ")
+                    
+                    if cont == 2:
+                        print("\n")
+                        break
+                break
+                    
             
-            getHeadeForTableFromTuples(("NOMBRE","USUARIO","PARTIDAS JUGADAS"),(10,20,30)) 
             print("\n")
             
+        #Menú Aventuras jugadas por el usuario
         elif opc == 3:
-            print(" "*40 + "Jocs jugats per l'usuari")
+            
+            keys = ('idAventure','adventure', 'date')
+            columns = (20,20,20)
+            
+            query = "SELECT A.ID_ADVENTURE, A.adventure_name, G.current_date from AMS.ADVENTURE A INNER JOIN AMS.GAME G ON G.FK_ADVENTURE_ID_ADVENTURE = A.ID_ADVENTURE;"
+            
+            diccionari = get_table(query)
+            
+            #print(" "*33 + "Jocs jugats per l'usuari")
+            
+            #getFormatedTable(diccionari,"Jocs jugats per l'usuari")
+            
             getHeadeForTableFromTuples(("ID AVENTURA","NOMBRE","FECHA"),(20,20,40)) 
-            getTableFromDict(keys, diccionari, columns)
+            
+            cont = 0
+            for i in diccionari:
+                
+                if cont == 0:
+                    pass
+                
+                for j in i:
+                    if cont == 0:
+                        pass
+                    
+                    print(str(j).ljust(20), end=" ")
+                    cont+=1
+            
             print("\n")
             
         else:
             break
     
+   
    
 def menu_aventuras(idAdventure):
     
@@ -403,23 +428,19 @@ def menu_aventuras(idAdventure):
 
     print("="*20+"Characters"+"="*20)
     
-    
     for j,k in characters.items():
         
         if idAdventure == 10:
-    
             if j == 1:
                 print(f"{j}) {k}")
             elif j == 2:
                 print(f"{j}) {k}")
                 
         elif idAdventure == 11:
-            
             if j == 3:
                 print(f"{j}) {k}")
                 
         elif idAdventure == 12:
-            
             if j == 4:
                 print(f"{j}) {k}")
     
@@ -442,6 +463,7 @@ def menu_aventuras(idAdventure):
 
 
 #/////////////////////////////////////////////////////////////// Funciones de formato ///////////////////////////////////////////////////////////////
+
 
 def getOpt(textOpts="",inputOptText="",rangeList=[],exceptions=[],**dictionary):
     
@@ -482,34 +504,77 @@ def getTableFromDict(tuple_of_keys, diccionari, weigth_of_columns):
     return " "
 
 
-def formatText(text, lenLine = 25, split = "\n"):
+def formatText(tupla_texts, tupla_sizes, split = "\n"):
     
-    l = text.split(" ")
-    lista_Frases = []
-    
-    for i in range(len(l)):
-        if not l[i] == l[-1]:
-            l[i] += " "
-    
-    contador = 0
-    for i in range(len(l)):
-        contador += len(l[i])
-        if contador <= lenLine or contador == lenLine + 1:
-            lista_Frases.append(l[i])
-        else:
-            lista_Frases.append(split + l[i])
+    tupla_texts = list(tupla_texts)
+    tupla_sizes = list(tupla_sizes)
+    for t in range(len(tupla_texts)):
+        l = tupla_texts[t].split(" ")
+        lista_Frases = []
+        for i in range(len(l)):
+            if not l[i] == l[-1]:
+                l[i] += " "
+        contador = 0
+        for i in range(len(l)):
+            contador += len(l[i])
+            if contador <= tupla_sizes[t] or contador == tupla_sizes[t] + 1:
+                lista_Frases.append(l[i])
+            else:
+                lista_Frases.append(split + l[i])
 
-            contador = len(l[i])
-    
-    for j in range(len(lista_Frases)):
-        print(lista_Frases[j], end= " ")
+                contador = len(l[i])
+        frase = ""
+        for i in range(len(lista_Frases)):
+            frase += lista_Frases[i]
+        ListaFinal = frase.split(split)
         
-    return " "
+        print(ListaFinal)
 
+
+listaFinalColumnas = []
+
+def getFormatedBodyColumns(tupla_texts,tupla_sizes,margin=2):
+    
+    tupla_texts = list(tupla_texts)
+    tupla_sizes = list(tupla_sizes)
+    
+    for t in range(len(tupla_texts)):
+        l = tupla_texts[t].split(" ")
+        lista_Frases = []
+        for i in range(len(l)):
+            if not l[i] == l[-1]:
+                l[i] += " "
+        contador = 0
+        for i in range(len(l)):
+            contador += len(l[i])
+            if contador <= tupla_sizes[t] or contador == tupla_sizes[t] + 1:
+                lista_Frases.append(l[i])
+            else:
+                lista_Frases.append("\n" + l[i])
+
+                contador = len(l[i])
+        frase = ""
+        for i in range(len(lista_Frases)):
+            frase += lista_Frases[i]
+        ListaFinal = frase.split("\n")
+        print(ListaFinal)
+        listaFinalColumnas.append(ListaFinal)
+        
+    #PARA PRINTARLO
+    for i in range(len(listaFinalColumnas)):
+        cuenta = 0
+        print(listaFinalColumnas[i][cuenta], end = margin * " ")
+        if i <= len(listaFinalColumnas):
+            cuenta += 1
+            
 
 def getFormatedTable(queryTable, title="Most used answer"):
  
     cont = 0
+    
+    length = 0
+    
+    sizes = (10,20,20)
     
     for i in queryTable:
         
@@ -517,16 +582,17 @@ def getFormatedTable(queryTable, title="Most used answer"):
             print("="*60+title+"="*60+"\n")
             for j in i:
                 print(j, end=" "*14)
-            print("\n\n"+"*"*136)        
+            print("\n\n"+"*"*136)     
             
-        
         if cont == 1:
             for j in i:
-                print(formatText(str(j)))
+                print(str(j))
         
         cont+=1
 
-    
+    return " "      
+      
+      
 def getHeadeForTableFromTuples(t_name_columns,t_size_columns,title=""):
     cont1=0
     cont2=0
@@ -595,52 +661,6 @@ def getHeader(text):
     print("*" * 100)
 
 
-def replay(choice):
-    # --CONSULTA--
-    cur = conn.cursor()
-    query1 = f"""select adventure_name, description, id_adventure from adventure 
-    where id_adventure=(select FK_ADVENTURE_ID_ADVENTURE from game where id_game={choice})"""
-    cur.execute(query1)
-    title = cur.fetchall()
-
-    print()
-    getHeader(str(title[0][0]))
-    formatText(str(title[0][1]),100)
-    cur.close()
-    print()
-    input("\n\nEnter para Continuar")
-
-    #--CONSULTA--
-    cur = conn.cursor()
-    query2 = f"""select d.ID_DECEISION ,s.id_step, s.step_description, o.id_option, o.option_description, o.go_step, 
-    (select s.step_description from step s where o.go_step=s.ID_STEP)
-    from ams.option o inner join ams.step s on o.fk_step_id_step=s.id_step
-    inner join decision d on o.id_option=d.fk_option_id_option
-    where FK_GAME_ID_GAME={choice}"""
-    cur.execute(query2)
-    history = cur.fetchall()
-
-    #while history[] repetir hasta acabar el replay
-    for i in history:
-        formatText(str(i[2]), 100)
-        print("\n")
-    input("Enter to contiune\n")
-
-    for i in history:
-        print("opcion: ")
-        formatText(str(i[3]), 100)
-        print()
-        formatText(str(i[4]), 100)
-        print("\n")
-    input("Enter to continue")
-    for i in history:
-        formatText(str(i[6]), 100)
-        print("\n")
-    getHeader("FIN")
-    cur.close()
-    conn.close()
-
-
 #////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
@@ -673,7 +693,7 @@ def login():
     elif int(chequeo) == 1:
         
         for i in userInfo:
-            print(f"Hola {i}, anem a jugar!!\nQuina aventura vols jugar?\n\n")
+            print(f"Hola, anem a jugar!!\nQuina aventura vols jugar?\n\n")
             return 1
    
 
@@ -1006,15 +1026,9 @@ def getReplayAdventures():
         idCharacter = i[6]
         characterName = i[7]
         
-        dictUser["idUser"] = idUser
-        dictUser["username"] = user_name
-        dictUser["idAdventure"] = idAdventure
-        dictUser["adventure"] = adventure_name
-        dictUser["characterName"] = characterName
-        dictUser["date"] = date
-        dictUser["idCharacter"] = idCharacter
+        dictUser = {idGame: {'idUser': idUser, 'username': user_name,'idAdventure': idAdventure,'adventure':adventure_name, 'characterName':characterName, 'date':date, 'idCharacter':idCharacter}}
+        dictGame.update(dictUser)
         
-        dictGame[idGame] = dictUser
     
     return dictGame
 
@@ -1048,10 +1062,42 @@ def getChoices():
     que ens permetran reviure una aventura donada'''
 
     cur = conn.cursor()
-    query3 = '''select D.FK_GAME_ID_GAME, D.FK_OPTION_ID_OPTION, O.answer from AMS.DECISION D 
-    inner join AMS.OPTION O on D.FK_OPTION_ID_OPTION = O.ID_OPTION'''
+    query3 = ''' SELECT D.FK_GAME_ID_GAME, D.FK_OPTION_ID_OPTION, O.answer from AMS.DECISION D 
+    inner join AMS.OPTION O on D.FK_OPTION_ID_OPTION = O.ID_OPTION '''
+    
     cur.execute(query3)
     choices = cur.fetchall()
-    print(choices)
-    input("\npulsar")
+    
+    #input("\nPulsar")
+    return choices
+
+
+def get_answers_bystep_adventure():
+    
+    dictGeneral = {}
+    
+    dict = {}
+    
+    query = """ SELECT concat("(",O.answer,",",O.FK_STEP_ADVENTURE_ID_ADVENTURE,")") as "Tupla de decisiones", 
+    (SELECT S.step_description from STEP S where ID_STEP = O.FK_STEP_ID_STEP) as "Descripción", 
+    O.answer as "Respuesta",
+    O.go_step as "Next Step" from AMS.OPTION O;"""
+    
+    cursor.execute(query)
+    
+    res = cursor.fetchall()
+    
+    for i in res:
+        idTuplas = i[0]
+        description = i[1]
+        answer = i[2]
+        next_step = i[3]
+        
+        dictUser = {idTuplas: {'Description': description, 'answer': answer,'NextStep': next_step}}
+        dictGeneral.update(dictUser)
+        
+    
+    return dictGeneral
+
+
 #/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
