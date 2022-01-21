@@ -1,18 +1,14 @@
-insert into `character`(character_name, description) value("osiris", "el destructor");
+#insert into `character`(character_name, description) value("osiris", "el destructor");
 
 insert into user(user_name, password) value("paco", "123");
 
 insert into game(FK_USER_ID_USER ,FK_ADVENTURE_ID_ADVENTURE, FK_CHARACTER_ID_CHARACTER) value (1, 10, 1);
-insert into game(FK_USER_ID_USER ,FK_ADVENTURE_ID_ADVENTURE, FK_CHARACTER_ID_CHARACTER) value (1, 12, 1);
-insert into 
-decision(FK_GAME_ID_GAME, FK_GAME_USER_ID_USER, FK_GAME_ADVENTURE_ID_ADVENTURE, FK_GAME_CHARACTER_ID_CHARACTER, FK_OPTION_ID_OPTION)
-value (1, 1, 10, 1, 102);
 
 #ID_GAME==1
 insert into 
 decision(FK_GAME_ID_GAME, FK_GAME_USER_ID_USER, FK_GAME_ADVENTURE_ID_ADVENTURE, FK_GAME_CHARACTER_ID_CHARACTER, FK_OPTION_ID_OPTION)
 value (1, 1, 10, 1, 102);
-#ID_GAME==2 opc1
+/*#ID_GAME==2 opc1
 insert into 
 decision(FK_GAME_ID_GAME, FK_GAME_USER_ID_USER, FK_GAME_ADVENTURE_ID_ADVENTURE, FK_GAME_CHARACTER_ID_CHARACTER, FK_OPTION_ID_OPTION)
 value (2, 1, 12, 1, 121);
@@ -21,6 +17,7 @@ value (2, 1, 12, 1, 121);
 insert into 
 decision(FK_GAME_ID_GAME, FK_GAME_USER_ID_USER, FK_GAME_ADVENTURE_ID_ADVENTURE, FK_GAME_CHARACTER_ID_CHARACTER, FK_OPTION_ID_OPTION)
 value (2, 1, 12, 1, 124);
+*/
 
 /*
 select * from game;
