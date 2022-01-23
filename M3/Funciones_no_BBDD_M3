@@ -20,3 +20,113 @@ def formatText(text, lenLine = 5, split = "\n"):
 	ListaFinal = frase.split(split)
 	print(ListaFinal)
 formatText(text)
+
+
+
+def formatText(tupla_texts, tupla_sizes, split = "\n"):
+    tupla_texts = list(tupla_texts)
+    tupla_sizes = list(tupla_sizes)
+    for t in range(len(tupla_texts)):
+        l = tupla_texts[t].split(" ")
+        lista_Frases = []
+        for i in range(len(l)):
+            if not l[i] == l[-1]:
+                l[i] += " "
+        contador = 0
+        for i in range(len(l)):
+            contador += len(l[i])
+            if contador <= tupla_sizes[t] or contador == tupla_sizes[t] + 1:
+                lista_Frases.append(l[i])
+            else:
+                lista_Frases.append(split + l[i])
+
+                contador = len(l[i])
+        frase = ""
+        for i in range(len(lista_Frases)):
+            frase += lista_Frases[i]
+        ListaFinal = frase.split(split)
+        print(ListaFinal)
+
+texto1 = input("Texto1: ")
+texto2 = input("Texto2: ")
+texto3 = input("Texto3: ")
+size1 = int(input("Size1: "))
+size2 = int(input("Size2: "))
+size3 = int(input("Size3: "))
+tupla_texts = (texto1, texto2, texto3)
+tupla_sizes = (size1, size2, size3)
+
+listaFinalColumnas = []
+def getFormatedBodyColumns(tupla_texts,tupla_sizes,margin=2):
+    tupla_texts = list(tupla_texts)
+    tupla_sizes = list(tupla_sizes)
+    for t in range(len(tupla_texts)):
+        l = tupla_texts[t].split(" ")
+        lista_Frases = []
+        for i in range(len(l)):
+            if not l[i] == l[-1]:
+                l[i] += " "
+        contador = 0
+        for i in range(len(l)):
+            contador += len(l[i])
+            if contador <= tupla_sizes[t] or contador == tupla_sizes[t] + 1:
+                lista_Frases.append(l[i])
+            else:
+                lista_Frases.append("\n" + l[i])
+
+                contador = len(l[i])
+        frase = ""
+        for i in range(len(lista_Frases)):
+            frase += lista_Frases[i]
+        ListaFinal = frase.split("\n")
+        listaFinalColumnas.append(ListaFinal)
+
+    #PARA PRINTARLO
+    linea = ""
+    textLinea = []
+    textsLinees = []
+    for j in range(len(listaFinalColumnas)):
+        textLinea.append(linea + " " * (tupla_sizes[j - 1] + margin - len(linea)))
+        linea = ""
+        textLinea = []
+        c = 0
+        for i in listaFinalColumnas[j]:
+            c += 1
+            if len(tupla_texts[j]) < tupla_sizes[j]:
+                if c == len(listaFinalColumnas[j]):
+                    linea += i + " " * ((tupla_sizes[j] + margin) - len(linea))
+                    textLinea.append(linea)
+                    linea = ""
+                else:
+                    linea += i + " "
+            elif len(linea) + len(i) + 1 + margin > tupla_sizes[j]:
+                linea += " " * (tupla_sizes[j] + margin - len(linea))
+                textLinea.append(linea)
+                linea = ""
+                linea += i + " "
+            else:
+                linea += i + " "
+        textsLinees.append(textLinea)
+    textLinea.append(linea + " " * (tupla_sizes[j] + margin - len(linea)))
+
+
+
+
+    if len(textsLinees[0]) > len(textsLinees[1]) and len(textsLinees[0]) > len(textsLinees[2]):
+        c = 0
+    elif len(textsLinees[1]) > len(textsLinees[0]) and len(textsLinees[1]) > len(textsLinees[2]):
+        c = 1
+    else:
+        c = 2
+    for j in range(len(textsLinees)):
+        if len(textsLinees[j]) <= len(textsLinees[c]):
+            for i in range(len(textsLinees[c]) - len(textsLinees[j])):
+                textsLinees[j].append(" " * tupla_sizes[j])
+    for i in range(len(textsLinees[c])):
+        print(textsLinees[0][i], end = "")
+        print(textsLinees[1][i], end = "")
+        print(textsLinees[2][i])
+
+
+
+getFormatedBodyColumns(tupla_texts, tupla_sizes)
