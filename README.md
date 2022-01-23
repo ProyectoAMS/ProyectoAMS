@@ -10,15 +10,13 @@ _La mecánica de Choose your Story consiste en un juego de eleccion lineal, dond
 
 ### Instalación 🔧
 
-* Explicacion de como instalar la aplicacion de CHOOSE YOUR STORY. Paso a paso hasta llegar a como iniciar el juego_
-
 Como cualquier proyecto de Github tendrás que clonarlo en tu PC
 
 ```
 git clone https://github.com/ProyectoAMS/ProyectoAMS.git
 ```
 
-# Como usarlo
+**Como usarlo**
 
 Para usarlo es muy sencillo, solo abre una terminal la carpeta del proyecto y escribe
 
