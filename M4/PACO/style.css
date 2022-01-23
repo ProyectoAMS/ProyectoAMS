@@ -71,7 +71,7 @@ body{
 .footer{
 	text-align: left;
 	color: #999999;
-	position: absolute;
+	position: relative;
   	bottom: 0;
   	width: 100%;
 }
@@ -113,7 +113,7 @@ body{
 .content .p1 .text,.content .p2 .text,.content .p3 .text{
 	
 	height: 200px;
-	width: 70%;
+	width: 60%;
 	display: flex;
 	flex-direction: column;
 	padding-top: 10%;
@@ -205,12 +205,13 @@ body{
 }
 .persona1 .texto, .persona2 .texto, .persona3 .texto, .persona4 .texto{
 	height: 200px;
-	width: 70%;
+	width: 60%;
 	display: flex;
 	flex-direction: column;
 	padding-top: 10%;
 }
 /*--CONTACTO--*/
+
 .content_contacto #contact_form{
 	background-color: #999999;
 	height: 50%;
@@ -225,9 +226,11 @@ form .row{
 	padding: 2%;
 }
 .content_contacto h2{
-	color: #fff;
-	position: fixed;
+	color: #999999;
+	position: relative;
 	text-align: justify;
+	margin-left: 25%;
+	padding: 10px;
 }
 .input{
 	height: 20px;

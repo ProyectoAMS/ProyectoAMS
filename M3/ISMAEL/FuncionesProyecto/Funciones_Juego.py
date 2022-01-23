@@ -1227,19 +1227,19 @@ def replay(choice):
 
     #while history[] repetir hasta acabar el replay
     for i in history:
-        formatText(str(i[2]), 100)
+        formatText(str(i[2]), 90)
         print("\n")
     input("Enter to contiune\n")
 
     for i in history:
         print("opcion: ")
-        formatText(str(i[3]), 100)
+        formatText(str(i[3]), 90)
         print()
-        formatText(str(i[4]), 100)
+        formatText(str(i[4]), 90)
         print("\n")
     input("Enter to continue")
     for i in history:
-        formatText(str(i[6]), 100)
+        formatText(str(i[6]), 90)
         print("\n")
     getHeader("FIN")
     cur.close()
