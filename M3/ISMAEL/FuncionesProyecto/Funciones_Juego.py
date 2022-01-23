@@ -3,6 +3,7 @@
 import datetime
 import time
 import pymysql
+import struct
 
 #/////////////////////////////////////////
 
@@ -24,6 +25,7 @@ cursor = conn.cursor()
 
 
 #//////////////////////////////////////////////////////////////////////// Menú ////////////////////////////////////////////////////////////////////////
+
 
 def menu_before():
     
@@ -163,7 +165,11 @@ def menu_after():
             
         elif opc == 2: # Jugar
             
-            jugar()
+            access = login()
+            
+            user = access[1]
+            
+            jugar(user)
             
         elif opc == 3: # Rejugar aventura
             
@@ -244,6 +250,9 @@ def replayAdventureMenu():
     
     diccionari = getReplayAdventures()
     
+    for i,j in diccionari.items():
+        idGame = i
+    
     print(getHeadeForTableFromTuples(("IdGame","Username","Name","CharacterName","date"),(10,20,30,20,20)))
     
     text = getTableFromDict(keys, diccionari, columns)
@@ -255,13 +264,14 @@ def replayAdventureMenu():
     
     opcion = int(getOpt(text, inputText, rangeList))
     
-    #replay()
+    replay(opcion)
     
     
 def reports():
     
-    textOpts= "\n" + " "*80 +  "1.- Resposta més utilitzada" + "\n" + " "*80 + "2.- Jugador amb més partides jugades" + "\n" + " "*80 + "3.- Jocs jugats per l'usuari" + "\n" + " "*80 + "4.- Enrere"
-    inputOptText="\n" + " "*80 + "Escull una opció: "
+    textOpts= "\n" + " "*50 +  "1.- Resposta més utilitzada" + "\n" + " "*50 + "2.- Jugador amb més partides jugades" + "\n" + " "*50 + "3.- Jocs jugats per l'usuari" + "\n" + " "*50 + "4.- Enrere"
+    inputOptText="\n" + " "*50 + "Escull una opció: "
+    
     lista = [1,2,3,4]
     exceptions = ["w","e",-1,0]
     
@@ -277,9 +287,9 @@ def reports():
                                         ╚═╝░░╚═╝╚══════╝╚═╝░░░░░░╚════╝░╚═╝░░╚═╝░░░╚═╝░░░╚═════╝░
 """
                 
-        print(" "*10+"//"*60)
+        print(" "*3+"//"*60)
         print("\n"+titulo+"\n")
-        print(" "*10+"//"*60)
+        print(" "*3+"//"*60)
         
         print("\n")
         opcion = getOpt(textOpts,inputOptText,lista, exceptions)
@@ -293,12 +303,18 @@ def reports():
             tupla_texts = []
             
             query = """
+            
             SELECT CONCAT(A.ID_ADVENTURE," - ",A.adventure_name) as "ID AVENTURA - NOMBRE", 
-            concat(S.ID_STEP, S.step_description) as "ID PASO - DESCRIPCION", 
-            concat(O.answer," - ",O.option_description) as "ID RESPUESTA - DESCRIPCION", 
-            concat("ALGO") as "NÚMERO VECES SELECCIONADA" 
-            from AMS.ADVENTURE A INNER JOIN AMS.STEP S ON S.FK_ADVENTURE_ID_ADVENTURE = A.ID_ADVENTURE INNER JOIN AMS.OPTION O ON O.FK_STEP_ID_STEP = S.ID_STEP;
-            """
+		    concat(S.ID_STEP, S.step_description) as "ID PASO - DESCRIPCION", 
+		    concat(O.answer," - ",O.option_description) as "ID RESPUESTA - DESCRIPCION", 
+		    count(D.FK_OPTION_ID_OPTION) as "NÚMERO VECES SELECCIONADA" 
+            from AMS.ADVENTURE A 
+            INNER JOIN AMS.STEP S ON S.FK_ADVENTURE_ID_ADVENTURE = A.ID_ADVENTURE 
+            INNER JOIN AMS.OPTION O ON O.FK_STEP_ID_STEP = S.ID_STEP
+            INNER JOIN AMS.DECISION D ON D.FK_OPTION_ID_OPTION = O.ID_OPTION
+            group by O.ID_OPTION
+            order by count(D.FK_OPTION_ID_OPTION)
+            desc limit 1000;"""
             
             res = list(get_table(query))
             
@@ -349,31 +365,35 @@ def reports():
         #Menú Aventuras jugadas por el usuario
         elif opc == 3:
             
-            keys = ('idAventure','adventure', 'date')
-            columns = (20,20,20)
+            listBody = []
             
-            print(getUserIds())
+            query = "SELECT MAX(FK_USER_ID_USER) FROM GAME;"
             
-            query = "SELECT A.ID_ADVENTURE, A.adventure_name, G.current_date from AMS.ADVENTURE A INNER JOIN AMS.GAME G ON G.FK_ADVENTURE_ID_ADVENTURE = A.ID_ADVENTURE;"
+            cursor.execute(query)
+            
+            res = cursor.fetchall()
+            
+            for i in res:
+                for j in i:
+                    idUser = j
+
+            query = f"SELECT A.ID_ADVENTURE, A.adventure_name, G.current_date from AMS.ADVENTURE A INNER JOIN AMS.GAME G ON G.FK_ADVENTURE_ID_ADVENTURE = A.ID_ADVENTURE INNER JOIN AMS.USER U ON G.FK_USER_ID_USER = U.ID_USER where ID_USER = {idUser};"
             
             diccionari = list(get_table(query))
             
             print(diccionari)
             
-            #print(" "*33 + "Jocs jugats per l'usuari")
-            
-            #getFormatedTable(diccionari,"Jocs jugats per l'usuari")
-            
-            getHeadeForTableFromTuples(("ID AVENTURA","NOMBRE","FECHA"),(20,20,40)) 
+            getHeadeForTableFromTuples(("ID AVENTURA","NOMBRE","FECHA"),(20,30,40)) 
             
             for i in diccionari:
-                j = list(i)
-                
-            print(j)
+                listBody.append(list(i))
             
-            cont = 0
-                #print(str(k[cont]).ljust(20), end=" ")
-                #cont+=1
+            listBody.pop(0)
+            
+            for k in listBody:
+                print("\n")
+                for j in k:
+                    print(str(j).ljust(10), end=" "*5)
                 
             
             print("\n")
@@ -385,7 +405,6 @@ def reports():
     
    
 def menu_aventuras(idAdventure, user):
-    
     fin = """
                             ░░░░░░░░░░░░  ███████╗██╗███╗░░██╗  ░░░░░░░░░░░░
                             ░░░░░░░░░░░░  ██╔════╝██║████╗░██║  ░░░░░░░░░░░░
@@ -394,11 +413,11 @@ def menu_aventuras(idAdventure, user):
                             ░░░░░░░░░░░░  ██║░░░░░██║██║░╚███║  ░░░░░░░░░░░░
                             ░░░░░░░░░░░░  ╚═╝░░░░░╚═╝╚═╝░░╚══╝  ░░░░░░░░░░░░
 """
-    
+
     inputOptText = "Select your Character (0 to Go back): "
     adventure = get_adventure_with_chars()
     characters = get_characters()
-    
+
     decisiones = ()
 
     text = " "
@@ -443,80 +462,115 @@ def menu_aventuras(idAdventure, user):
     if int(opc) == 0:
         menu_after()
 
-    elif int(opc) ==1 or int(opc) ==2 or int(opc) ==3 or int(opc) ==4:
-        
+    elif int(opc) == 1 or int(opc) == 2 or int(opc) == 3 or int(opc) == 4:
+
         char = get_characters()
-        
+
         userInfo = getUserIds()
         
-        idUser = userInfo[0].index(user) + 1
-                
-        for i,j in char.items():
+
+        idUser = userInfo[0].index(user)
+        
+        for i, j in char.items():
             if int(opc) == i:
                 print(f"Has seleccionat a {j}")
-                
-                insertCurrentGame(idUser,i,idAdventure)
-        
+                charac=i
+
+                insertCurrentGame(idUser, charac, idAdventure)
+
         input("\nPrém ENTER per continuar\n")
-            
-        text=titulo
-        getHeader(text)
-        print()
 
-        #print(get_id_bystep_adventure(idAdventure))
-        sql5 = f"SELECT * FROM AMS.STEP where ID_STEP = {get_first_step_adventure(idAdventure)}"  #printa el primer paso
-        cursor.execute(sql5)
-        step = cursor.fetchall()
-        for i in step:
-            print(i)
-            opt = i[1]
-            print(opt)
-        print('Opcions:\n')
-        
-        sql1 = f"SELECT * FROM AMS.OPTION where FK_STEP_ID_STEP = {get_first_step_adventure(idAdventure)}" #printa las opciones el primer paso
-        cursor.execute(sql1)
-        option = cursor.fetchall()
-        for i in option:
-            id=i[0]
-            opts = i[1]
-            print(" "*2 + str(id),')',opts)
-            print()
-
-    while True:
-        
-        option = int(input('\nSelect Option: \n'))
-        sql3 = f"SELECT * FROM AMS.OPTION where ID_OPTION = {option}"  # mira la opcion
-        cursor.execute(sql3)
-        option = cursor.fetchall()
-        
-        for i in option:
-            go=i[3]
-        go_step=go
-        
-        sql2 = f"SELECT * FROM AMS.STEP where ID_STEP = {go_step}"
-        cursor.execute(sql2)
-        step = cursor.fetchall()
-        
         text = titulo
         getHeader(text)
         print()
+
+        # print(get_id_bystep_adventure(idAdventure))
+        sql5 = f"SELECT * FROM AMS.STEP where ID_STEP = {get_first_step_adventure(idAdventure)}"  # printa el primer paso
+        cursor.execute(sql5)
+        step = cursor.fetchall()
         
         for i in step:
             opt = i[1]
             print(opt)
-            print()
-            
-        sql4 = f"SELECT * FROM AMS.OPTION where FK_STEP_ID_STEP = {go_step}"
-        cursor.execute(sql4)
+        print('Opcions:\n')
+
+        sql1 = f"SELECT * FROM AMS.OPTION where FK_STEP_ID_STEP = {get_first_step_adventure(idAdventure)}"  # printa las opciones el primer paso
+        cursor.execute(sql1)
         option = cursor.fetchall()
-        
         for i in option:
-            id = i[0]
-            opt = i[1]
-            print(id,')',opt)
+            ids = i[0]
+            opts = i[1]
+            print(" " * 2 + str(ids), ')', opts)
             print()
 
+    while True:
+        while True:
+            
+            resFinal = 0
+            
+            sql6 = f"SELECT * FROM GAME"
+            cursor.execute(sql6)
+            option = cursor.fetchall()
+            for i in option:
+                id = i[0]
+            game = id
+            
+            if resFinal == 1:
+                print(fin)
+                print("\n")
+                input("Prém ENTER per continuar")
+                menu_after()
+            else:
+                option = int(input('\nSelect Option: \n'))
+            
+            insertCurrentChoice(game, idUser, idAdventure, charac, option)
+            
+            
+            
+            sql3 = f"SELECT * FROM AMS.OPTION where ID_OPTION = {option}"  # mira la opcion
+            cursor.execute(sql3)
+            option = cursor.fetchall()
 
+            for i in option:
+                go = i[3]
+            go_step = go
+
+            sql2 = f"SELECT * FROM AMS.STEP where ID_STEP = {go_step}"
+            cursor.execute(sql2)
+            step = cursor.fetchall()
+
+            text = titulo
+            getHeader(text)
+            print()
+
+            for i in step:
+                final = i[2]
+                resFinal = int.from_bytes(final, byteorder="little")
+                opt = i[1]
+                print(opt)
+                print()
+            
+            
+            
+            sql4 = f"SELECT * FROM AMS.OPTION where FK_STEP_ID_STEP = {go_step}"
+            cursor.execute(sql4)
+            option = cursor.fetchall()
+
+            for i in option:
+                id = i[0]
+                opt = i[1]
+                print(id, ')', opt)
+                print()
+                
+            if resFinal == 1:
+                print(fin)
+                print("\n")
+                input("Prém ENTER per continuar")
+                menu_after()
+            
+            break
+        
+        
 #////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
@@ -567,7 +621,6 @@ def getTableFromDict(tuple_of_keys, diccionari, weigth_of_columns):
 
 
 def formatText(tupla_texts, tupla_sizes, split = "\n"):
-    
     tupla_texts = list(tupla_texts)
     tupla_sizes = list(tupla_sizes)
     for t in range(len(tupla_texts)):
@@ -589,17 +642,13 @@ def formatText(tupla_texts, tupla_sizes, split = "\n"):
         for i in range(len(lista_Frases)):
             frase += lista_Frases[i]
         ListaFinal = frase.split(split)
-        
-        print(ListaFinal)
-
+    
+    return " "
 
 listaFinalColumnas = []
-
 def getFormatedBodyColumns(tupla_texts,tupla_sizes,margin=2):
-    
     tupla_texts = list(tupla_texts)
     tupla_sizes = list(tupla_sizes)
-    
     for t in range(len(tupla_texts)):
         l = tupla_texts[t].split(" ")
         lista_Frases = []
@@ -619,41 +668,83 @@ def getFormatedBodyColumns(tupla_texts,tupla_sizes,margin=2):
         for i in range(len(lista_Frases)):
             frase += lista_Frases[i]
         ListaFinal = frase.split("\n")
-        print(ListaFinal)
         listaFinalColumnas.append(ListaFinal)
-        
+
     #PARA PRINTARLO
-    for i in range(len(listaFinalColumnas)):
-        cuenta = 0
-        print(listaFinalColumnas[i][cuenta], end = margin * " ")
-        if i <= len(listaFinalColumnas):
-            cuenta += 1
-            
+    linea = ""
+    textLinea = []
+    textsLinees = []
+    for j in range(len(listaFinalColumnas)):
+        textLinea.append(linea + " " * (tupla_sizes[j - 1] + margin - len(linea)))
+        linea = ""
+        textLinea = []
+        c = 0
+        for i in listaFinalColumnas[j]:
+            c += 1
+            if len(tupla_texts[j]) < tupla_sizes[j]:
+                if c == len(listaFinalColumnas[j]):
+                    linea += i + " " * ((tupla_sizes[j] + margin) - len(linea))
+                    textLinea.append(linea)
+                    linea = ""
+                else:
+                    linea += i + " "
+            elif len(linea) + len(i) + 1 + margin > tupla_sizes[j]:
+                linea += " " * (tupla_sizes[j] + margin - len(linea))
+                textLinea.append(linea)
+                linea = ""
+                linea += i + " "
+            else:
+                linea += i + " "
+        textsLinees.append(textLinea)
+    textLinea.append(linea + " " * (tupla_sizes[j] + margin - len(linea)))
+
+
+
+
+    if len(textsLinees[0]) > len(textsLinees[1]) and len(textsLinees[0]) > len(textsLinees[2]):
+        c = 0
+    elif len(textsLinees[1]) > len(textsLinees[0]) and len(textsLinees[1]) > len(textsLinees[2]):
+        c = 1
+    else:
+        c = 2
+    for j in range(len(textsLinees)):
+        if len(textsLinees[j]) <= len(textsLinees[c]):
+            for i in range(len(textsLinees[c]) - len(textsLinees[j])):
+                textsLinees[j].append(" " * tupla_sizes[j])
+    for i in range(len(textsLinees[c])):
+        print(textsLinees[0][i], end = "")
+        print(textsLinees[1][i], end = "")
+        print(textsLinees[2][i])
+
 
 def getFormatedTable(queryTable, title="Most used answer"):
- 
-    cont = 0
     
-    length = 0
+    listQuery = list(queryTable)
+    listTitle = []
+    listBody = []
     
-    sizes = (10,20,20)
-    
-    for i in queryTable:
+    for i in listQuery[0]:
+        listTitle.append(i)
         
-        if cont == 0:
-            print("="*60+title+"="*60+"\n")
-            for j in i:
-                print(j, end=" "*14)
-            print("\n\n"+"*"*136)     
+    for i in listQuery[len(listQuery) - 1]:
+        print(i)
+        listBody.append(str(i))
+    
+    print(listQuery)
+    print(listTitle)
+    print(listBody)
+    
+    sizes = (20,30,30,20, 20)
+    
+    print("="*52+title+"="*52+"\n")
+    for i in listTitle:    
+        print(str(i).ljust(30), end=" ")
+    print("\n"+"*"*120)
             
-        if cont == 1:
-            for j in i:
-                print(str(j))
-        
-        cont+=1
-
-    return " "      
-      
+    print(getFormatedBodyColumns(tuple(listBody), sizes, margin=4))
+    
+    return " "
+     
       
 def getHeadeForTableFromTuples(t_name_columns,t_size_columns,title=""):
     cont1=0
@@ -977,12 +1068,11 @@ def insertCurrentGame(idUser,idChar,idAdventure):
     conn.commit()
 
 
-def insertCurrentChoice(idGame,idUser,idAdventure,idChar,idOption,idStep):
-    sql=f"INSERT INTO AMS.DECISION (FK_GAME_ID_GAME,FK_GAME_USER_ID_USER,FK_GAME_ADVENTURE_ID_ADVENTURE,FK_GAME_CHARACTER_ID_CHARACTER,FK_OPTION_ID_OPTION,FK_STEP_ID_STEP,FK_STEP_ADVENTURE_ID_ADVENTURE) VALUES ('{idGame}','{idUser}','{idAdventure}','{idChar}','{idOption}','{idStep}','{idAdventure}')"
-    mycursor=conn.cursor()
+def insertCurrentChoice(game, idUser, idAdventure, idChar, idOption):
+    sql = f"INSERT INTO AMS.DECISION (FK_GAME_ID_GAME,FK_GAME_USER_ID_USER,FK_GAME_ADVENTURE_ID_ADVENTURE,FK_GAME_CHARACTER_ID_CHARACTER,FK_OPTION_ID_OPTION) VALUES ('{game}','{idUser}','{idAdventure}','{idChar}','{idOption}')"
+    mycursor = conn.cursor()
     mycursor.execute(sql)
     conn.commit()
-
 
 def get_first_step_adventure():
     while True:
@@ -1203,8 +1293,8 @@ def replay(choice):
     
     # --CONSULTA--
     cur = conn.cursor()
-    query1 = f"""select adventure_name, description, id_adventure from adventure 
-    where id_adventure=(select FK_ADVENTURE_ID_ADVENTURE from game where id_game={choice})"""
+    query1 = f"""select adventure_name, description, ID_ADVENTURE from ADVENTURE 
+    where id_adventure=(select FK_ADVENTURE_ID_ADVENTURE from GAME where ID_GAME= {choice});"""
     cur.execute(query1)
     title = cur.fetchall()
 
@@ -1217,11 +1307,12 @@ def replay(choice):
 
     #--CONSULTA--
     cur = conn.cursor()
-    query2 = f"""select d.ID_DECEISION ,s.id_step, s.step_description, o.id_option, o.option_description, o.go_step, 
-    (select s.step_description from step s where o.go_step=s.ID_STEP)
-    from ams.option o inner join ams.step s on o.fk_step_id_step=s.id_step
-    inner join decision d on o.id_option=d.fk_option_id_option
-    where FK_GAME_ID_GAME={choice}"""
+    query2 = f"""select d.ID_DECEISION ,s.ID_STEP, s.step_description, o.ID_OPTION, o.option_description, o.go_step, 
+    (select s.step_description from STEP s where o.go_step = s.ID_STEP)
+    from AMS.OPTION o inner join AMS.STEP s on o.FK_STEP_ID_STEP =s.ID_STEP
+    inner join AMS.DECISION d on o.ID_OPTION = d.FK_OPTION_ID_OPTION
+    where FK_GAME_ID_GAME= {choice};"""
+    
     cur.execute(query2)
     history = cur.fetchall()
 
