@@ -176,7 +176,9 @@ body{
 	border: none;
 	cursor: pointer;
 }
-
+iframe{
+	border-radius: 10px;
+}
 
 /*--AboutUs--*/
 .content h1{
