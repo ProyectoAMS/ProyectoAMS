@@ -5,20 +5,20 @@ _Choose your Story consiste en un juego de elección donde podemos elegir distin
 
 ## Mecánica del juego ⚙️
 
-_La mecánica de Choose your Story consiste en un juego de eleccion lineal, donde para poder avanzar con la historia del protagonista, deveremos de elegir distintas opciones. Las opciones que elegimos van variando segun avanza la historia. Lo primero que tendremos de hacer será crear una cuenta que nos permitirá el acceso al juego total, despues tendremos un menú donde podremos elegir entre jugar, elegir historia o ver el progreso, entre otras opciones._
+_La mecánica de Choose your Story consiste en un juego de elección lineal, donde para poder avanzar con la historia del protagonista, deberemos de elegir distintas opciones. Las opciones que elegimos van variando según avanza la historia. Lo primero que tendremos que hacer será crear una cuenta que nos permitirá el acceso al juego total, después tendremos un menú donde podremos elegir entre jugar, elegir historia o ver el progreso, entre otras opciones._
 
 
 ### Instalación 🔧
 
-Como cualquier proyecto de Github tendrás que clonarlo en tu PC
+_Como cualquier proyecto de Github tendrás que clonarlo en tu PC_
 
 ```
 git clone https://github.com/ProyectoAMS/ProyectoAMS.git
 ```
 
-**Como usarlo**
+### Como usarlo
 
-Para usarlo es muy sencillo, solo abre una terminal la carpeta del proyecto y escribe
+_Para usarlo es muy sencillo, solo abre una terminal en la carpeta del proyecto y escribe_
 
 ```
 cd ProyectoAMS/M3
@@ -30,7 +30,7 @@ python main.py
 
 * [Microsoft Azure](https://azure.microsoft.com/es-es/free/search/) - El ambiente de la maquina
 * [MySql](https://www.mysql.com) - Manejador de la Base de Datos
-* [PyCharm](https://www.jetbrains.com/es-es/pycharm/) - Usado Usado para el desarollo
+* [PyCharm](https://www.jetbrains.com/es-es/pycharm/) - Usado para el desarollo
 
 
 ## Autores ✒️
